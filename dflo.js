@@ -148,12 +148,20 @@ var Publisher = Component.extend({
         this.ports.stdout.write(message);
     },
     connect: function (component) {
+        var input = this.findInputPort(component);
+        this.ports.stdout.connect(input);
+    },
+    disconnect: function (component) {
+        var input = this.findInputPort(component);
+        this.ports.stdout.disconnect(input);
+    },
+    findInputPort: function (component) {
         if (!(component instanceof Component))
             throw new Error("Invalid argument: component, Component required.");
         var input = component.ports.stdin;
         if (!(input instanceof InputPort))
             throw new Error("Cannot find input port on the given component.");
-        this.ports.stdout.connect(input);
+        return input;
     }
 });
 
