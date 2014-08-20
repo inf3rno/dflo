@@ -29,6 +29,9 @@ Class.abstractMethod = abstractMethod;
 
 
 var Sequence = Class.extend({
+    initial: undefined,
+    state: undefined,
+    generator: undefined,
     init: function (config) {
         this.state = config.initial;
         this.generator = config.generator;
@@ -61,11 +64,67 @@ var uniqueId = new Sequence({
     initial: 0
 }).wrapper();
 
+var Port = Class.extend({
+    id: undefined,
+    buffer: undefined,
+    init: function (config) {
+        this.id = uniqueId();
+        this.buffer = [];
+        if (config)
+            this.update(config);
+    },
+    update: function (config) {
+    },
+    write: function () {
+        this.buffer.push([].slice.apply(arguments));
+    },
+    read: function () {
+        return this.buffer.shift();
+    }
+});
+
+var InputPort = Port.extend({
+    reader: undefined,
+    context: undefined,
+    update: function (config) {
+        this.reader = config.reader;
+        this.context = config.context;
+    },
+    write: function () {
+        Port.prototype.write.apply(this, arguments);
+        this.reader.apply(this.context, this.read());
+    }
+});
+
+var OutputPort = Port.extend({
+    connections: undefined,
+    init: function (config) {
+        this.connections = {};
+        Port.prototype.init.apply(this, arguments);
+    },
+    write: function () {
+        Port.prototype.write.apply(this, arguments);
+        var args = this.read();
+        for (var id in this.connections) {
+            var port = this.connections[id];
+            port.write.apply(port, args);
+        }
+    },
+    connect: function (port) {
+        this.connections[port.id] = port;
+    },
+    disconnect: function (port) {
+        delete (this.connections[port.id]);
+    }
+});
 
 var dflo = {
     Class: Class,
     Sequence: Sequence,
-    uniqueId: uniqueId
+    uniqueId: uniqueId,
+    Port: Port,
+    InputPort: InputPort,
+    OutputPort: OutputPort
 };
 
 module.exports = dflo;
