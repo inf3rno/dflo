@@ -10,6 +10,28 @@ I don't think that everything is a nail, and dataflow-based patterns should be u
 sync code should still be developed with the good old sync javascript as usual and just the communication between the different parts of the application
 should be solved with dataflow-based code islands.
 
+## Examples
+
+No examples available currently.
+
+## Documentation
+
+The [documentation](docs/dflo.md) is currently available as md files in the docs directory, but this will probably change later.
+
+### Installation
+
+#### Requirements
+
+Currently no requirements needed.
+
+#### NPM
+
+No npm repo available (because I don't want to add version numbers).
+
+### Manually
+
+I don't recommend to install the package yet, it is no use, but if you insist you can simple require the dflo.js file.
+
 ## License
 
 The MIT License (MIT)
