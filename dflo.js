@@ -27,8 +27,45 @@ var Class = extend(Object, {
 Class.abstractInit = abstractInit;
 Class.abstractMethod = abstractMethod;
 
+
+var Sequence = Class.extend({
+    init: function (config) {
+        this.state = config.initial;
+        this.generator = config.generator;
+    },
+    get: function () {
+        return this.state;
+    },
+    next: function () {
+        var args = [this.state];
+        args.push.apply(args, arguments);
+        this.state = this.generator.apply(this, args);
+        return this.get();
+    },
+    wrapper: function () {
+        var store = [];
+        store.push.apply(store, arguments);
+        return function () {
+            var args = [];
+            args.push.apply(args, store);
+            args.push.apply(args, arguments);
+            return this.next.apply(this, args);
+        }.bind(this);
+    }
+});
+
+var uniqueId = new Sequence({
+    generator: function (previousId) {
+        return ++previousId;
+    },
+    initial: 0
+}).wrapper();
+
+
 var dflo = {
-    Class: Class
+    Class: Class,
+    Sequence: Sequence,
+    uniqueId: uniqueId
 };
 
 module.exports = dflo;
