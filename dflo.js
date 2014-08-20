@@ -87,6 +87,8 @@ var InputPort = Port.extend({
     reader: undefined,
     context: undefined,
     update: function (config) {
+        if (!(config.reader instanceof Function))
+            throw new Error("Invalid arguments: config.reader, Function required.");
         this.reader = config.reader;
         this.context = config.context;
     },
@@ -111,10 +113,68 @@ var OutputPort = Port.extend({
         }
     },
     connect: function (port) {
+        if (!(port instanceof InputPort))
+            throw new Error("Invalid argument: port, InputPort required.");
         this.connections[port.id] = port;
     },
     disconnect: function (port) {
         delete (this.connections[port.id]);
+    }
+});
+
+var Message = Class.extend({
+    data: undefined,
+    init: function (data) {
+        this.data = data;
+    }
+});
+
+var Component = Class.extend({
+    ports: undefined,
+    init: function () {
+        this.id = uniqueId();
+        this.ports = {};
+    }
+});
+
+var Publisher = Component.extend({
+    init: function () {
+        Component.prototype.init.apply(this, arguments);
+        this.ports.stdout = new OutputPort();
+    },
+    publish: function () {
+        var data = [].slice.apply(arguments);
+        var message = new Message(data);
+        this.ports.stdout.write(message);
+    },
+    connect: function (component) {
+        if (!(component instanceof Component))
+            throw new Error("Invalid argument: component, Component required.");
+        var input = component.ports.stdin;
+        if (!(input instanceof InputPort))
+            throw new Error("Cannot find input port on the given component.");
+        this.ports.stdout.connect(input);
+    }
+});
+
+var Subscriber = Component.extend({
+    init: function (config) {
+        Component.prototype.init.apply(this, arguments);
+        this.ports.stdin = new InputPort({
+            reader: this.notify,
+            context: this
+        });
+        if (config)
+            this.update(config);
+    },
+    update: function (config) {
+        if (!(config.listener instanceof Function))
+            throw new Error("Invalid argument: config.listener, Function required.");
+        this.listener = config.listener;
+        this.context = config.context;
+    },
+    notify: function (message) {
+        this.listener.apply(this.context, message.data);
     }
 });
 
@@ -124,7 +184,11 @@ var dflo = {
     uniqueId: uniqueId,
     Port: Port,
     InputPort: InputPort,
-    OutputPort: OutputPort
+    OutputPort: OutputPort,
+    Message: Message,
+    Component: Component,
+    Publisher: Publisher,
+    Subscriber: Subscriber
 };
 
 module.exports = dflo;
