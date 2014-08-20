@@ -30,7 +30,7 @@ describe("examples", function () {
         var Observer = Class.extend({
             init: function () {
                 this.subscriber = new Subscriber({
-                    listener: this.notify,
+                    callback: this.notify,
                     context: this
                 });
             },

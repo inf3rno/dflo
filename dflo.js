@@ -84,17 +84,17 @@ var Port = Class.extend({
 });
 
 var InputPort = Port.extend({
-    reader: undefined,
+    callback: undefined,
     context: undefined,
     update: function (config) {
-        if (!(config.reader instanceof Function))
-            throw new Error("Invalid arguments: config.reader, Function required.");
-        this.reader = config.reader;
+        if (!(config.callback instanceof Function))
+            throw new Error("Invalid arguments: config.callback, Function required.");
+        this.callback = config.callback;
         this.context = config.context;
     },
     write: function () {
         Port.prototype.write.apply(this, arguments);
-        this.reader.apply(this.context, this.read());
+        this.callback.apply(this.context, this.read());
     }
 });
 
@@ -169,20 +169,20 @@ var Subscriber = Component.extend({
     init: function (config) {
         Component.prototype.init.apply(this, arguments);
         this.ports.stdin = new InputPort({
-            reader: this.notify,
+            callback: this.notify,
             context: this
         });
         if (config)
             this.update(config);
     },
     update: function (config) {
-        if (!(config.listener instanceof Function))
-            throw new Error("Invalid argument: config.listener, Function required.");
-        this.listener = config.listener;
+        if (!(config.callback instanceof Function))
+            throw new Error("Invalid argument: config.callback, Function required.");
+        this.callback = config.callback;
         this.context = config.context;
     },
     notify: function (message) {
-        this.listener.apply(this.context, message.data);
+        this.callback.apply(this.context, message.data);
     }
 });
 

@@ -24,7 +24,7 @@ describe("dflo", function () {
             var component = new Component();
             var spy = jasmine.createSpy();
             component.ports.stdin = new InputPort({
-                reader: function (message) {
+                callback: function (message) {
                     expect(message instanceof Message).toBe(true);
                     spy.apply(null, message.data);
                 }
@@ -80,7 +80,7 @@ describe("dflo", function () {
 
                 var log = jasmine.createSpy();
                 var subscriber = new Subscriber({
-                    listener: log
+                    callback: log
                 });
                 publisher.connect(subscriber);
                 publisher.publish(4, 5, 6);

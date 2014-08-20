@@ -34,19 +34,19 @@
 
 ## <a name="InputPort"></a> InputPort : [Port](#Port)
 
-### <a name="InputPort.reader"></a> reader of Function (params[0], params[1], ...)
+### <a name="InputPort.callback"></a> callback of Function (params[0], params[1], ...)
 
 ### <a name="InputPort.context"></a> context of Object
 
-### <a name="InputPort.update"></a> update (config of Object[reader, context])
+### <a name="InputPort.update"></a> update (config of Object[callback, context])
 
 **arguments**
 
- <a name="InputPort.update.config"></a> config of Object[reader, context]
+ <a name="InputPort.update.config"></a> config of Object[callback, context]
 
- - <a name="InputPort.update.config.reader"></a> reader of Function (params[0], params[1], ...)
+ - <a name="InputPort.update.config.callback"></a> callback of Function (params[0], params[1], ...)
 
- - <a name="InputPort.update.config.reader"></a> context of Object
+ - <a name="InputPort.update.config.callback"></a> context of Object
 
 ### <a name="InputPort.write"></a> write (params[0], params[1], ...)
 

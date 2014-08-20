@@ -27,9 +27,9 @@ Documentation
      - *: Class*
        - *static [extend](dlo.class.md#Class.extend) (properties of Object) -> descendant : Class*
    - [InputPort](dflo.port.md#InputPort) : Port
-     - [reader](dflo.port.md#InputPort.reader) of Function (params[0], params[1], ...)
+     - [callback](dflo.port.md#InputPort.callback) of Function (params[0], params[1], ...)
      - [context](dflo.port.md#InputPort.context) of Object
-     - [update](dflo.port.md#InputPort.update) (config of Object[reader, context])
+     - [update](dflo.port.md#InputPort.update) (config of Object[callback, context])
      - [write](dflo.port.md#InputPort.write) (params[0], params[1], ...)
      - *: Port*
        - *[id](dflo.port.md#Port.id) id of Number*

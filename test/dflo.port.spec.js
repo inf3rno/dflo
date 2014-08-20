@@ -24,14 +24,14 @@ describe("dflo", function () {
 
     describe("InputPort", function () {
 
-        it("automatically reads the data into a reader function after it was written", function () {
+        it("automatically reads the data into a callback function after it was written", function () {
 
-            var mockReader = jasmine.createSpy();
+            var mockCallback = jasmine.createSpy();
             var port = new InputPort({
-                reader: mockReader
+                callback: mockCallback
             });
             port.write(1, 2, 3);
-            expect(mockReader).toHaveBeenCalledWith(1, 2, 3);
+            expect(mockCallback).toHaveBeenCalledWith(1, 2, 3);
         });
 
     });
@@ -40,32 +40,32 @@ describe("dflo", function () {
 
         it("automatically read the data into connected InputPorts after it was written", function () {
 
-            var mockReaders = {
+            var mockCallbacks = {
                 a: jasmine.createSpy(),
                 b: jasmine.createSpy(),
                 c: jasmine.createSpy()
             };
             var inputs = {};
-            for (var name in mockReaders)
+            for (var name in mockCallbacks)
                 inputs[name] = new InputPort({
-                    reader: mockReaders[name]
+                    callback: mockCallbacks[name]
                 });
             var output = new OutputPort();
             output.connect(inputs.a);
             output.connect(inputs.b);
             output.write(1, 2, 3);
-            expect(mockReaders.a).toHaveBeenCalledWith(1, 2, 3);
-            expect(mockReaders.a.callCount).toBe(1);
-            expect(mockReaders.b).toHaveBeenCalledWith(1, 2, 3);
-            expect(mockReaders.b.callCount).toBe(1);
-            expect(mockReaders.c).not.toHaveBeenCalled();
+            expect(mockCallbacks.a).toHaveBeenCalledWith(1, 2, 3);
+            expect(mockCallbacks.a.callCount).toBe(1);
+            expect(mockCallbacks.b).toHaveBeenCalledWith(1, 2, 3);
+            expect(mockCallbacks.b.callCount).toBe(1);
+            expect(mockCallbacks.c).not.toHaveBeenCalled();
 
             output.disconnect(inputs.b);
             output.connect(inputs.c);
             output.write(4, 5, 6);
-            expect(mockReaders.a).toHaveBeenCalledWith(4, 5, 6);
-            expect(mockReaders.b).not.toHaveBeenCalledWith(4, 5, 6);
-            expect(mockReaders.c).toHaveBeenCalledWith(4, 5, 6);
+            expect(mockCallbacks.a).toHaveBeenCalledWith(4, 5, 6);
+            expect(mockCallbacks.b).not.toHaveBeenCalledWith(4, 5, 6);
+            expect(mockCallbacks.c).toHaveBeenCalledWith(4, 5, 6);
         });
 
     });
