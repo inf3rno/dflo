@@ -1,0 +1,54 @@
+# DFlo Documentation
+
+Documentation
+
+ - [class](dflo.class.md)
+   - [Class](dlo.class.md#Class) : Object
+     - static [extend](dlo.class.md#Class.extend) (properties of Object) -> descendant : Class
+     - [init](dlo.class.md#Class.init) ()
+ - [sequence](dflo.sequence.md)
+   - [Sequence](dflo.sequence.md#Sequence) : Class
+     - [init](dflo.sequence.md#Sequence.init) ()
+     - [state](dflo.sequence.md#Sequence.state)
+     - [get](dflo.sequence.md#Sequence.get) () -> state
+     - [next](dflo.sequence.md#Sequence.next) (params[0], params[1], ...) -> state
+     - [wrapper](dflo.sequence.md#Sequence.wrapper) (params[0], params[1]) -> nextWrapper (params[2], params[3], ...)
+     - *: Class*
+       - *static [extend](dlo.class.md#Class.extend) (properties of Object) -> descendant : Class*
+   - [uniqueId](dflo.sequence.md#uniqueId) () -> id of Number
+ - [port](dflo.port.md)
+   - [Port](dflo.port.md#Port) : Class
+     - [id](dflo.port.md#Port.id) id of Number
+     - [buffer](dflo.port.md#Port.buffer) of Array [params of Array]
+     - [init](dflo.port.md#Port.init) (config of Object)
+     - [update](dflo.port.md#Port.update) (config of Object from init())
+     - [write](dflo.port.md#Port.write) (params[0], params[1], ...) to buffer
+     - [read](dflo.port.md#Port.read) () -> params of Array from buffer
+     - *: Class*
+       - *static [extend](dlo.class.md#Class.extend) (properties of Object) -> descendant : Class*
+   - [InputPort](dflo.port.md#InputPort) : Port
+     - [reader](dflo.port.md#InputPort.reader) of Function (params[0], params[1], ...)
+     - [context](dflo.port.md#InputPort.context) of Object
+     - [update](dflo.port.md#InputPort.update) (config of Object[reader, context])
+     - [write](dflo.port.md#InputPort.write) (params[0], params[1], ...)
+     - *: Port*
+       - *[id](dflo.port.md#Port.id) id of Number*
+       - *[buffer](dflo.port.md#Port.buffer) of Array [params of Array]*
+       - *[init](dflo.port.md#Port.init) (config of Object)*
+       - *[read](dflo.port.md#Port.read) () -> params of Array from buffer*
+     - *: Class*
+       - *static [extend](dlo.class.md#Class.extend) (properties of Object) -> descendant : Class*
+   - [OutputPort](dflo.port.md#OutputPort) : Port
+     - [connections](dflo.port.md#OutputPort.connections) of Set[port of InputPort]
+     - [connect](dflo.port.md#OutputPort.connect) (port of InputPort)
+     - [disconnect](dflo.port.md#OutputPort.disconnect) (port of InputPort)
+     - [write](dflo.port.md#OutputPort.write) (params[0], params[1], ...)
+     - *: Port*
+       - *[id](dflo.port.md#Port.id) id of Number*
+       - *[buffer](dflo.port.md#Port.buffer) of Array [params of Array]*
+       - *[init](dflo.port.md#Port.init) (config of Object)*
+       - *[update](dflo.port.md#Port.update) (config of Object from init())*
+       - *[read](dflo.port.md#Port.read) () -> params of Array from buffer*
+     - *: Class*
+       - *static [extend](dlo.class.md#Class.extend) (properties of Object) -> descendant : Class*
+
