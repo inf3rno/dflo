@@ -230,8 +230,12 @@ var Traverser = Publisher.extend({
             return;
         if (component.id in visited)
             return this.traverseNext(queue, visited);
+        this.publish(Traverser.COMPONENT, component);
         for (var portName in component.ports) {
             var port = component.ports[portName];
+            if (port.id in visited)
+                continue;
+            this.publish(Traverser.PORT, port);
             for (var remotePortId in port.connections) {
                 var remotePort = port.connections[remotePortId];
                 var output = port;
@@ -244,15 +248,18 @@ var Traverser = Publisher.extend({
                 if (connectionId in visited)
                     continue;
                 visited[connectionId] = true;
-                this.publish(output, input);
+                this.publish(Traverser.CONNECTION, output, input);
                 queue.push(remotePort.component);
             }
+            visited[port.id] = true;
         }
         visited[component.id] = true;
         return this.traverseNext(queue, visited);
     }
 });
-
+Traverser.COMPONENT = 0;
+Traverser.PORT = 1;
+Traverser.CONNECTION = 2;
 
 var dflo = {
     Class: Class,
