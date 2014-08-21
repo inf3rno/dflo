@@ -218,6 +218,42 @@ var Subscriber = Component.extend({
 });
 
 
+var Traverser = Publisher.extend({
+    traverse: function (component) {
+        if (!(component instanceof Component))
+            throw new Error("Invalid argument: origin, Component required.");
+        this.traverseNext([component], {});
+    },
+    traverseNext: function (queue, visited) {
+        var component = queue.shift();
+        if (!component)
+            return;
+        if (component.id in visited)
+            return this.traverseNext(queue, visited);
+        for (var portName in component.ports) {
+            var port = component.ports[portName];
+            for (var remotePortId in port.connections) {
+                var remotePort = port.connections[remotePortId];
+                var output = port;
+                var input = remotePort;
+                if (port instanceof InputPort) {
+                    output = remotePort;
+                    input = port;
+                }
+                var connectionId = output.id + "," + input.id;
+                if (connectionId in visited)
+                    continue;
+                visited[connectionId] = true;
+                this.publish(output, input);
+                queue.push(remotePort.component);
+            }
+        }
+        visited[component.id] = true;
+        return this.traverseNext(queue, visited);
+    }
+});
+
+
 var dflo = {
     Class: Class,
     Sequence: Sequence,
@@ -228,7 +264,8 @@ var dflo = {
     Message: Message,
     Component: Component,
     Publisher: Publisher,
-    Subscriber: Subscriber
+    Subscriber: Subscriber,
+    Traverser: Traverser
 };
 
 module.exports = dflo;
