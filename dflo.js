@@ -64,58 +64,6 @@ var uniqueId = new Sequence({
     initial: 0
 }).wrapper();
 
-var Port = Class.extend({
-    id: undefined,
-    init: function (config) {
-        if (this.constructor === Port)
-            abstractInit();
-        this.id = uniqueId();
-        if (config)
-            this.update(config);
-    },
-    update: abstractMethod,
-    relay: abstractMethod
-});
-
-var InputPort = Port.extend({
-    callback: undefined,
-    context: undefined,
-    update: function (config) {
-        if (!(config.callback instanceof Function))
-            throw new Error("Invalid arguments: config.callback, Function required.");
-        this.callback = config.callback;
-        this.context = config.context;
-    },
-    relay: function () {
-        this.callback.apply(this.context, arguments);
-    }
-});
-
-var OutputPort = Port.extend({
-    connections: undefined,
-    init: function (config) {
-        this.connections = {};
-        Port.prototype.init.apply(this, arguments);
-    },
-    update: function (config) {
-
-    },
-    relay: function () {
-        for (var id in this.connections) {
-            var port = this.connections[id];
-            port.relay.apply(port, arguments);
-        }
-    },
-    connect: function (port) {
-        if (!(port instanceof InputPort))
-            throw new Error("Invalid argument: port, InputPort required.");
-        this.connections[port.id] = port;
-    },
-    disconnect: function (port) {
-        delete (this.connections[port.id]);
-    }
-});
-
 var Message = Class.extend({
     data: undefined,
     init: function (data) {
@@ -131,10 +79,97 @@ var Component = Class.extend({
     }
 });
 
+var Port = Class.extend({
+    id: undefined,
+    component: undefined,
+    name: undefined,
+    connections: undefined,
+    init: function (config) {
+        if (this.constructor === Port)
+            abstractInit();
+        this.id = uniqueId();
+        this.connections = {};
+        if (!config)
+            throw new Error("Invalid arguments: config is required.");
+        if (!(config.component))
+            throw new Error("Invalid arguments: config.component is required.");
+        if (!(config.component instanceof Component))
+            throw new Error("Invalid arguments: config.component, Component required.");
+        this.component = config.component;
+        if (typeof(config.name) != "string")
+            throw  new Error("Invalid arguments: config.name, String required.");
+        this.name = config.name;
+    },
+    connect: function (port) {
+        if (!(port instanceof Port))
+            throw new Error("Invalid arguments: port, Port required.");
+        if (this.isConnected(port))
+            return;
+        this.connections[port.id] = port;
+        if (!port.isConnected(this))
+            port.connect(this);
+    },
+    disconnect: function (port) {
+        if (!(port instanceof Port))
+            throw new Error("Invalid arguments: port, Port required.");
+        if (this.isConnected(port))
+            delete(this.connections[port.id]);
+        if (port.isConnected(this))
+            port.disconnect(this);
+    },
+    isConnected: function (port) {
+        if (!(port instanceof Port))
+            throw new Error("Invalid arguments: port, Port required.");
+        return (port.id in this.connections);
+    },
+    relay: abstractMethod
+});
+
+var InputPort = Port.extend({
+    callback: undefined,
+    context: undefined,
+    init: function (config) {
+        Port.prototype.init.apply(this, arguments);
+        if (!(config.callback instanceof Function))
+            throw new Error("Invalid arguments: config.callback, Function required.");
+        this.callback = config.callback;
+        this.context = config.context;
+    },
+    connect: function (port) {
+        if (!(port instanceof OutputPort))
+            throw new Error("Invalid argument: port, OutputPort required.");
+        Port.prototype.connect.apply(this, arguments);
+    },
+    relay: function (message) {
+        if (!(message instanceof Message))
+            throw new Error("Invalid argument: message, Message required.");
+        this.callback.call(this.context, message);
+    }
+});
+
+var OutputPort = Port.extend({
+    connect: function (port) {
+        if (!(port instanceof InputPort))
+            throw new Error("Invalid argument: port, InputPort required.");
+        Port.prototype.connect.apply(this, arguments);
+    },
+    relay: function (message) {
+        if (!(message instanceof Message))
+            throw new Error("Invalid argument: message, Message required.");
+        for (var id in this.connections) {
+            var input = this.connections[id];
+            input.relay(message);
+        }
+    }
+});
+
 var Publisher = Component.extend({
     init: function () {
         Component.prototype.init.apply(this, arguments);
-        this.ports.stdout = new OutputPort();
+        this.ports.stdout = new OutputPort({
+            component: this,
+            name: "stdout"
+        });
     },
     publish: function () {
         var data = [].slice.apply(arguments);
@@ -163,6 +198,8 @@ var Subscriber = Component.extend({
     init: function (config) {
         Component.prototype.init.apply(this, arguments);
         this.ports.stdin = new InputPort({
+            component: this,
+            name: "stdin",
             callback: this.notifyCallback,
             context: this
         });
@@ -179,6 +216,7 @@ var Subscriber = Component.extend({
         this.callback.apply(this.context, message.data);
     }
 });
+
 
 var dflo = {
     Class: Class,

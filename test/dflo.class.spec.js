@@ -95,6 +95,20 @@ describe("dflo", function () {
                 }).toThrow(warningMessages.abstractMethodCall);
             });
 
+            it("uses prototypal inheritance, so by the instances the instanceOf works on both of the ancestor and descendant", function () {
+
+                var Ancestor = Class.extend({
+                    init: function () {
+                    }
+                });
+                var Descendant = Ancestor.extend();
+                var instance = new Descendant();
+
+                expect(instance instanceof Class).toBe(true);
+                expect(instance instanceof Ancestor).toBe(true);
+                expect(instance instanceof Descendant).toBe(true);
+            });
+
         });
 
     });

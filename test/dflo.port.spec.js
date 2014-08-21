@@ -1,69 +1,320 @@
 var dflo = require("../dflo"),
     Port = dflo.Port,
     InputPort = dflo.InputPort,
-    OutputPort = dflo.OutputPort;
+    OutputPort = dflo.OutputPort,
+    Message = dflo.Message,
+    Component = dflo.Component;
 
 describe("dflo", function () {
 
+    var MockPort = Port.extend({
+        relay: function () {
+        }
+    });
+
     describe("Port", function () {
 
-        var MockPort = Port.extend({
-            update: function () {
-            },
-            relay: function () {
-            }
+        describe("id", function () {
+
+            it("has a unique id", function () {
+                var port1 = new MockPort({
+                    component: new Component(),
+                    name: ""
+                });
+                var port2 = new MockPort({
+                    component: new Component(),
+                    name: ""
+                });
+                expect(port1.id).not.toEqual(port2.id);
+            });
+
         });
 
-        it("has a unique id", function () {
-            expect(new MockPort().id).not.toEqual(new MockPort().id);
+        describe("name", function () {
+
+            it("is a string given in the config", function () {
+
+                var port1 = new MockPort({
+                    component: new Component(),
+                    name: "something"
+                });
+                expect(port1.name).toBe("something");
+            });
+
+        });
+
+        describe("connections", function () {
+
+            it("can be traversed from both side of the connection", function () {
+
+                var mockPorts = [];
+                for (var i = 0; i < 3; ++i)
+                    mockPorts[i] = new MockPort({
+                        component: new Component(),
+                        name: ""
+                    });
+                mockPorts[0].connect(mockPorts[1]);
+                expect(mockPorts[1].id in mockPorts[0].connections).toBe(true);
+                expect(mockPorts[0].id in mockPorts[1].connections).toBe(true);
+                expect(mockPorts[2].id in mockPorts[0].connections).toBe(false);
+            });
+
+        });
+
+        describe("init()", function () {
+
+            it("requires a Component instance as component", function () {
+                expect(function () {
+                    new MockPort({
+                        name: ""
+                    });
+                }).toThrow("Invalid arguments: config.component is required.");
+
+                expect(function () {
+                    new MockPort({
+                        component: {},
+                        name: ""
+                    });
+                }).toThrow("Invalid arguments: config.component, Component required.");
+
+                expect(function () {
+                    new MockPort({
+                        component: new Component(),
+                        name: ""
+                    });
+                }).not.toThrow();
+            });
+
+            it("requires a String as a name", function () {
+                expect(function () {
+                    new MockPort({
+                        component: new Component()
+                    });
+                }).toThrow("Invalid arguments: config.name, String required.");
+
+                expect(function () {
+                    new MockPort({
+                        component: new Component(),
+                        name: {}
+                    });
+                }).toThrow("Invalid arguments: config.name, String required.");
+
+                expect(function () {
+                    new MockPort({
+                        component: new Component(),
+                        name: ""
+                    });
+                }).not.toThrow();
+            });
+
+        });
+
+        describe("isConnected()", function () {
+
+            it("can be asked on both side of the connection", function () {
+
+                var mockPorts = [];
+                for (var i = 0; i < 3; ++i)
+                    mockPorts[i] = new MockPort({
+                        component: new Component(),
+                        name: ""
+                    });
+                mockPorts[0].connect(mockPorts[1]);
+                expect(mockPorts[0].isConnected(mockPorts[1])).toBe(true);
+                expect(mockPorts[1].isConnected(mockPorts[0])).toBe(true);
+                expect(mockPorts[0].isConnected(mockPorts[2])).toBe(false);
+                expect(mockPorts[2].isConnected(mockPorts[0])).toBe(false);
+            });
+
         });
 
     });
 
     describe("InputPort", function () {
 
-        it("automatically reads the data into a callback function after it was written", function () {
+        describe("init()", function () {
 
-            var mockCallback = jasmine.createSpy();
-            var port = new InputPort({
-                callback: mockCallback
+            it("requires a Function instance as a callback", function () {
+
+                expect(function () {
+                    new InputPort({
+                        component: new Component(),
+                        name: "",
+                        callback: {}
+                    });
+                }).toThrow("Invalid arguments: config.callback, Function required.");
+
+                expect(function () {
+                    new InputPort({
+                        component: new Component(),
+                        name: "",
+                        callback: function () {
+                        }
+                    });
+                }).not.toThrow();
+
             });
-            port.relay(1, 2, 3);
-            expect(mockCallback).toHaveBeenCalledWith(1, 2, 3);
+
+        });
+
+        describe("relay()", function () {
+
+            it("automatically reads the data into a callback function after it was written", function () {
+
+                var mockCallback = jasmine.createSpy();
+                var port = new InputPort({
+                    callback: mockCallback,
+                    component: new Component(),
+                    name: ""
+                });
+                var message = new Message();
+                port.relay(message);
+                expect(mockCallback).toHaveBeenCalledWith(message);
+            });
+
+            it("can relay only Messages", function () {
+
+                var port = new InputPort({
+                    callback: function () {
+                    },
+                    component: new Component(),
+                    name: ""
+                });
+                expect(function () {
+                    port.relay({});
+                }).toThrow("Invalid argument: message, Message required.");
+
+            });
+
+        });
+
+        describe("connect()", function () {
+
+            it("can connect only to OutputPorts", function () {
+
+                var inputs = [];
+                for (var i = 0; i < 2; ++i)
+                    inputs[i] = new InputPort({
+                        callback: function () {
+                        },
+                        component: new Component(),
+                        name: ""
+                    });
+                var mockPort = new MockPort({
+                    component: new Component(),
+                    name: ""
+                });
+                var output = new OutputPort({
+                    component: new Component(),
+                    name: ""
+                });
+                expect(function () {
+                    inputs[0].connect(inputs[1]);
+                }).toThrow("Invalid argument: port, OutputPort required.");
+
+                expect(function () {
+                    mockPort.connect(inputs[0]);
+                }).toThrow("Invalid argument: port, OutputPort required.")
+
+                expect(function () {
+                    inputs[0].connect(output);
+                }).not.toThrow();
+            });
+
         });
 
     });
 
     describe("OutputPort", function () {
 
-        it("automatically read the data into connected InputPorts after it was written", function () {
+        describe("relay()", function () {
 
-            var mockCallbacks = {
-                a: jasmine.createSpy(),
-                b: jasmine.createSpy(),
-                c: jasmine.createSpy()
-            };
-            var inputs = {};
-            for (var name in mockCallbacks)
-                inputs[name] = new InputPort({
-                    callback: mockCallbacks[name]
+            it("automatically read the data into connected InputPorts after it was written", function () {
+
+                var mockCallbacks = {
+                    a: jasmine.createSpy(),
+                    b: jasmine.createSpy(),
+                    c: jasmine.createSpy()
+                };
+                var inputs = {};
+                for (var name in mockCallbacks)
+                    inputs[name] = new InputPort({
+                        callback: mockCallbacks[name],
+                        component: new Component(),
+                        name: ""
+                    });
+                var output = new OutputPort({
+                    component: new Component(),
+                    name: ""
                 });
-            var output = new OutputPort();
-            output.connect(inputs.a);
-            output.connect(inputs.b);
-            output.relay(1, 2, 3);
-            expect(mockCallbacks.a).toHaveBeenCalledWith(1, 2, 3);
-            expect(mockCallbacks.a.callCount).toBe(1);
-            expect(mockCallbacks.b).toHaveBeenCalledWith(1, 2, 3);
-            expect(mockCallbacks.b.callCount).toBe(1);
-            expect(mockCallbacks.c).not.toHaveBeenCalled();
+                output.connect(inputs.a);
+                output.connect(inputs.b);
 
-            output.disconnect(inputs.b);
-            output.connect(inputs.c);
-            output.relay(4, 5, 6);
-            expect(mockCallbacks.a).toHaveBeenCalledWith(4, 5, 6);
-            expect(mockCallbacks.b).not.toHaveBeenCalledWith(4, 5, 6);
-            expect(mockCallbacks.c).toHaveBeenCalledWith(4, 5, 6);
+                var message1 = new Message(1);
+                var message2 = new Message(2);
+
+                output.relay(message1);
+                expect(mockCallbacks.a).toHaveBeenCalledWith(message1);
+                expect(mockCallbacks.a.callCount).toBe(1);
+                expect(mockCallbacks.b).toHaveBeenCalledWith(message1);
+                expect(mockCallbacks.b.callCount).toBe(1);
+                expect(mockCallbacks.c).not.toHaveBeenCalled();
+
+                output.disconnect(inputs.b);
+                output.connect(inputs.c);
+                output.relay(message2);
+                expect(mockCallbacks.a).toHaveBeenCalledWith(message2);
+                expect(mockCallbacks.b).not.toHaveBeenCalledWith(message2);
+                expect(mockCallbacks.c).toHaveBeenCalledWith(message2);
+            });
+
+            it("can relay only Messages", function () {
+
+                var port = new OutputPort({
+                    component: new Component(),
+                    name: ""
+                });
+                expect(function () {
+                    port.relay({});
+                }).toThrow("Invalid argument: message, Message required.");
+
+            });
+
+        });
+
+        describe("connect()", function () {
+
+            it("can connect only to InputPorts", function () {
+
+                var outputs = [];
+                for (var i = 0; i < 2; ++i)
+                    outputs[i] = new OutputPort({
+                        component: new Component(),
+                        name: ""
+                    });
+                var mockPort = new MockPort({
+                    component: new Component(),
+                    name: ""
+                });
+                var input = new InputPort({
+                    component: new Component(),
+                    name: "",
+                    callback: function () {
+                    }
+                });
+                expect(function () {
+                    outputs[0].connect(outputs[1]);
+                }).toThrow("Invalid argument: port, InputPort required.");
+
+                expect(function () {
+                    mockPort.connect(outputs[0]);
+                }).toThrow("Invalid argument: port, InputPort required.")
+
+                expect(function () {
+                    outputs[0].connect(input);
+                }).not.toThrow();
+            });
+
         });
 
     });
