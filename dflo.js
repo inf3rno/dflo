@@ -238,6 +238,10 @@ var Traverser = Publisher.extend({
             this.publish(Traverser.PORT, port);
             for (var remotePortId in port.connections) {
                 var remotePort = port.connections[remotePortId];
+                if (!(remotePort.id in visited)) {
+                    queue.push(remotePort.component);
+                    continue;
+                }
                 var output = port;
                 var input = remotePort;
                 if (port instanceof InputPort) {
@@ -249,7 +253,6 @@ var Traverser = Publisher.extend({
                     continue;
                 visited[connectionId] = true;
                 this.publish(Traverser.CONNECTION, output, input);
-                queue.push(remotePort.component);
             }
             visited[port.id] = true;
         }
