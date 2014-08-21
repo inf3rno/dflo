@@ -30,7 +30,8 @@ No npm repo available (because I don't want to add version numbers).
 
 ### Manually
 
-I don't recommend to install the package yet, it is no use, but if you insist you can simple require the dflo.js file.
+I don't recommend to install the package yet, it is no use, but if you insist you can simply require the dflo.js file by node.js,
+or with browserify in browsers.
 
 ## License
 
