@@ -7,17 +7,15 @@ describe("dflo", function () {
 
     describe("Port", function () {
 
-        it("has a unique id", function () {
-            expect(new Port().id).not.toEqual(new Port().id);
+        var MockPort = Port.extend({
+            update: function () {
+            },
+            relay: function () {
+            }
         });
 
-        it("stores written data in a buffer until it is readed", function () {
-
-            var port = new Port();
-            port.write(1, 2, 3);
-            port.write(4, 5, 6);
-            expect(port.read()).toEqual([1, 2, 3]);
-            expect(port.read()).toEqual([4, 5, 6]);
+        it("has a unique id", function () {
+            expect(new MockPort().id).not.toEqual(new MockPort().id);
         });
 
     });
@@ -30,7 +28,7 @@ describe("dflo", function () {
             var port = new InputPort({
                 callback: mockCallback
             });
-            port.write(1, 2, 3);
+            port.relay(1, 2, 3);
             expect(mockCallback).toHaveBeenCalledWith(1, 2, 3);
         });
 
@@ -53,7 +51,7 @@ describe("dflo", function () {
             var output = new OutputPort();
             output.connect(inputs.a);
             output.connect(inputs.b);
-            output.write(1, 2, 3);
+            output.relay(1, 2, 3);
             expect(mockCallbacks.a).toHaveBeenCalledWith(1, 2, 3);
             expect(mockCallbacks.a.callCount).toBe(1);
             expect(mockCallbacks.b).toHaveBeenCalledWith(1, 2, 3);
@@ -62,7 +60,7 @@ describe("dflo", function () {
 
             output.disconnect(inputs.b);
             output.connect(inputs.c);
-            output.write(4, 5, 6);
+            output.relay(4, 5, 6);
             expect(mockCallbacks.a).toHaveBeenCalledWith(4, 5, 6);
             expect(mockCallbacks.b).not.toHaveBeenCalledWith(4, 5, 6);
             expect(mockCallbacks.c).toHaveBeenCalledWith(4, 5, 6);

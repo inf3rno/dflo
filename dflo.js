@@ -66,21 +66,15 @@ var uniqueId = new Sequence({
 
 var Port = Class.extend({
     id: undefined,
-    buffer: undefined,
     init: function (config) {
+        if (this.constructor === Port)
+            abstractInit();
         this.id = uniqueId();
-        this.buffer = [];
         if (config)
             this.update(config);
     },
-    update: function (config) {
-    },
-    write: function () {
-        this.buffer.push([].slice.apply(arguments));
-    },
-    read: function () {
-        return this.buffer.shift();
-    }
+    update: abstractMethod,
+    relay: abstractMethod
 });
 
 var InputPort = Port.extend({
@@ -92,9 +86,8 @@ var InputPort = Port.extend({
         this.callback = config.callback;
         this.context = config.context;
     },
-    write: function () {
-        Port.prototype.write.apply(this, arguments);
-        this.callback.apply(this.context, this.read());
+    relay: function () {
+        this.callback.apply(this.context, arguments);
     }
 });
 
@@ -104,12 +97,13 @@ var OutputPort = Port.extend({
         this.connections = {};
         Port.prototype.init.apply(this, arguments);
     },
-    write: function () {
-        Port.prototype.write.apply(this, arguments);
-        var args = this.read();
+    update: function (config) {
+
+    },
+    relay: function () {
         for (var id in this.connections) {
             var port = this.connections[id];
-            port.write.apply(port, args);
+            port.relay.apply(port, arguments);
         }
     },
     connect: function (port) {
@@ -145,7 +139,7 @@ var Publisher = Component.extend({
     publish: function () {
         var data = [].slice.apply(arguments);
         var message = new Message(data);
-        this.ports.stdout.write(message);
+        this.ports.stdout.relay(message);
     },
     connect: function (component) {
         var input = this.findInputPort(component);
@@ -169,7 +163,7 @@ var Subscriber = Component.extend({
     init: function (config) {
         Component.prototype.init.apply(this, arguments);
         this.ports.stdin = new InputPort({
-            callback: this.notify,
+            callback: this.notifyCallback,
             context: this
         });
         if (config)
@@ -181,7 +175,7 @@ var Subscriber = Component.extend({
         this.callback = config.callback;
         this.context = config.context;
     },
-    notify: function (message) {
+    notifyCallback: function (message) {
         this.callback.apply(this.context, message.data);
     }
 });

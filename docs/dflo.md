@@ -19,36 +19,27 @@ Documentation
  - [port](dflo.port.md)
    - [Port](dflo.port.md#Port) : Class
      - [id](dflo.port.md#Port.id) id of Number
-     - [buffer](dflo.port.md#Port.buffer) of Array [params of Array]
      - [init](dflo.port.md#Port.init) (config of Object)
-     - [update](dflo.port.md#Port.update) (config of Object from init())
-     - [write](dflo.port.md#Port.write) (params[0], params[1], ...) to buffer
-     - [read](dflo.port.md#Port.read) () -> params of Array from buffer
      - *: Class*
        - *static [extend](dlo.class.md#Class.extend) (properties of Object) -> descendant : Class*
    - [InputPort](dflo.port.md#InputPort) : Port
      - [callback](dflo.port.md#InputPort.callback) of Function (params[0], params[1], ...)
      - [context](dflo.port.md#InputPort.context) of Object
      - [update](dflo.port.md#InputPort.update) (config of Object[callback, context])
-     - [write](dflo.port.md#InputPort.write) (params[0], params[1], ...)
+     - [relay](dflo.port.md#InputPort.relay) (params[0], params[1], ...)
      - *: Port*
        - *[id](dflo.port.md#Port.id) id of Number*
-       - *[buffer](dflo.port.md#Port.buffer) of Array [params of Array]*
        - *[init](dflo.port.md#Port.init) (config of Object)*
-       - *[read](dflo.port.md#Port.read) () -> params of Array from buffer*
      - *: Class*
        - *static [extend](dlo.class.md#Class.extend) (properties of Object) -> descendant : Class*
    - [OutputPort](dflo.port.md#OutputPort) : Port
      - [connections](dflo.port.md#OutputPort.connections) of Set[port of InputPort]
      - [connect](dflo.port.md#OutputPort.connect) (port of InputPort)
      - [disconnect](dflo.port.md#OutputPort.disconnect) (port of InputPort)
-     - [write](dflo.port.md#OutputPort.write) (params[0], params[1], ...)
+     - [relay](dflo.port.md#OutputPort.relay) (params[0], params[1], ...)
      - *: Port*
        - *[id](dflo.port.md#Port.id) id of Number*
-       - *[buffer](dflo.port.md#Port.buffer) of Array [params of Array]*
        - *[init](dflo.port.md#Port.init) (config of Object)*
-       - *[update](dflo.port.md#Port.update) (config of Object from init())*
-       - *[read](dflo.port.md#Port.read) () -> params of Array from buffer*
      - *: Class*
        - *static [extend](dlo.class.md#Class.extend) (properties of Object) -> descendant : Class*
 

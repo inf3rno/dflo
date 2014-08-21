@@ -5,32 +5,11 @@
 
 ### <a name="Port.id"></a> id of Number
 
-### <a name="Port.buffer"></a> buffer of Array [params of Array]
-
 ### <a name="Port.init"></a> init (config of Object)
 
 **arguments**
 
  <a name="Port.init.config"></a> config of Object
-
-### <a name="Port.update"></a> update (config of Object)
-
-**arguments**
-
- <a name="Port.update.config"></a> config of Object
-
-### <a name="Port.write"></a> write (params[0], params[1], ...) to buffer
-
-**arguments**
-
- <a name="Port.write.params"></a> params of Array to buffer
-
-### <a name="Port.read"></a> read () -> params of Array from buffer
-
-**returns**
-
- <a name="Port.read.params"></a> params of Array from buffer
-
 
 ## <a name="InputPort"></a> InputPort : [Port](#Port)
 
@@ -48,11 +27,11 @@
 
  - <a name="InputPort.update.config.callback"></a> context of Object
 
-### <a name="InputPort.write"></a> write (params[0], params[1], ...)
+### <a name="InputPort.relay"></a> relay (params[0], params[1], ...)
 
 **arguments**
 
- <a name="InputPort.write.params"></a> params of Array
+ <a name="InputPort.relay.params"></a> params of Array
 
 
 ## <a name="OutputPort"></a> OutputPort : [Port](#Port)
@@ -71,8 +50,8 @@
 
  <a name="OutputPort.disconnect.port"></a> port of [InputPort](#InputPort)
 
-### <a name="OutputPort.write"></a> write (params[0], params[1], ...)
+### <a name="OutputPort.relay"></a> relay (params[0], params[1], ...)
 
 **arguments**
 
- <a name="OutputPort.write.params"></a> params of Array
+ <a name="OutputPort.relay.params"></a> params of Array
