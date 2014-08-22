@@ -16,7 +16,7 @@ should be solved with dataflow-based code islands.
 
 ## Documentation
 
-The [documentation](docs/dflo.md) is currently available as md files in the docs directory, but this will probably change later.
+The documentation is not yet available.
 
 ### Installation
 
