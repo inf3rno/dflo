@@ -12,7 +12,7 @@ should be solved with dataflow-based code islands.
 
 ## Examples
 
- - [Observer pattern](test/examples.observer.spec.js)
+ - [Observer pattern](test/example.observer.spec.js)
 
 ## Documentation
 
