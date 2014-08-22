@@ -18,27 +18,25 @@ describe("dflo", function () {
 
             it("has a unique id", function () {
                 var port1 = new MockPort({
-                    component: new Component(),
-                    name: ""
+                    component: new Component()
                 });
                 var port2 = new MockPort({
-                    component: new Component(),
-                    name: ""
+                    component: new Component()
                 });
                 expect(port1.id).not.toEqual(port2.id);
             });
 
         });
 
-        describe("name", function () {
+        describe("label", function () {
 
             it("is a string given in the config", function () {
 
                 var port1 = new MockPort({
                     component: new Component(),
-                    name: "something"
+                    label: "something"
                 });
-                expect(port1.name).toBe("something");
+                expect(port1.label).toBe("something");
             });
 
         });
@@ -50,8 +48,7 @@ describe("dflo", function () {
                 var mockPorts = [];
                 for (var i = 0; i < 3; ++i)
                     mockPorts[i] = new MockPort({
-                        component: new Component(),
-                        name: ""
+                        component: new Component()
                     });
                 mockPorts[0].connect(mockPorts[1]);
                 expect(mockPorts[1].id in mockPorts[0].connections).toBe(true);
@@ -65,44 +62,18 @@ describe("dflo", function () {
 
             it("requires a Component instance as component", function () {
                 expect(function () {
-                    new MockPort({
-                        name: ""
-                    });
+                    new MockPort({});
                 }).toThrow("Invalid arguments: config.component is required.");
 
                 expect(function () {
                     new MockPort({
-                        component: {},
-                        name: ""
+                        component: {}
                     });
                 }).toThrow("Invalid arguments: config.component, Component required.");
 
                 expect(function () {
                     new MockPort({
-                        component: new Component(),
-                        name: ""
-                    });
-                }).not.toThrow();
-            });
-
-            it("requires a String as a name", function () {
-                expect(function () {
-                    new MockPort({
                         component: new Component()
-                    });
-                }).toThrow("Invalid arguments: config.name, String required.");
-
-                expect(function () {
-                    new MockPort({
-                        component: new Component(),
-                        name: {}
-                    });
-                }).toThrow("Invalid arguments: config.name, String required.");
-
-                expect(function () {
-                    new MockPort({
-                        component: new Component(),
-                        name: ""
                     });
                 }).not.toThrow();
             });
@@ -116,8 +87,7 @@ describe("dflo", function () {
                 var mockPorts = [];
                 for (var i = 0; i < 3; ++i)
                     mockPorts[i] = new MockPort({
-                        component: new Component(),
-                        name: ""
+                        component: new Component()
                     });
                 mockPorts[0].connect(mockPorts[1]);
                 expect(mockPorts[0].isConnected(mockPorts[1])).toBe(true);
@@ -139,7 +109,6 @@ describe("dflo", function () {
                 expect(function () {
                     new InputPort({
                         component: new Component(),
-                        name: "",
                         callback: {}
                     });
                 }).toThrow("Invalid arguments: config.callback, Function required.");
@@ -147,7 +116,6 @@ describe("dflo", function () {
                 expect(function () {
                     new InputPort({
                         component: new Component(),
-                        name: "",
                         callback: function () {
                         }
                     });
@@ -164,8 +132,7 @@ describe("dflo", function () {
                 var mockCallback = jasmine.createSpy();
                 var port = new InputPort({
                     callback: mockCallback,
-                    component: new Component(),
-                    name: ""
+                    component: new Component()
                 });
                 var message = new Message();
                 port.relay(message);
@@ -177,8 +144,7 @@ describe("dflo", function () {
                 var port = new InputPort({
                     callback: function () {
                     },
-                    component: new Component(),
-                    name: ""
+                    component: new Component()
                 });
                 expect(function () {
                     port.relay({});
@@ -197,16 +163,13 @@ describe("dflo", function () {
                     inputs[i] = new InputPort({
                         callback: function () {
                         },
-                        component: new Component(),
-                        name: ""
+                        component: new Component()
                     });
                 var mockPort = new MockPort({
-                    component: new Component(),
-                    name: ""
+                    component: new Component()
                 });
                 var output = new OutputPort({
-                    component: new Component(),
-                    name: ""
+                    component: new Component()
                 });
                 expect(function () {
                     inputs[0].connect(inputs[1]);
@@ -240,12 +203,10 @@ describe("dflo", function () {
                 for (var name in mockCallbacks)
                     inputs[name] = new InputPort({
                         callback: mockCallbacks[name],
-                        component: new Component(),
-                        name: ""
+                        component: new Component()
                     });
                 var output = new OutputPort({
-                    component: new Component(),
-                    name: ""
+                    component: new Component()
                 });
                 output.connect(inputs.a);
                 output.connect(inputs.b);
@@ -271,8 +232,7 @@ describe("dflo", function () {
             it("can relay only Messages", function () {
 
                 var port = new OutputPort({
-                    component: new Component(),
-                    name: ""
+                    component: new Component()
                 });
                 expect(function () {
                     port.relay({});
@@ -289,16 +249,13 @@ describe("dflo", function () {
                 var outputs = [];
                 for (var i = 0; i < 2; ++i)
                     outputs[i] = new OutputPort({
-                        component: new Component(),
-                        name: ""
+                        component: new Component()
                     });
                 var mockPort = new MockPort({
-                    component: new Component(),
-                    name: ""
+                    component: new Component()
                 });
                 var input = new InputPort({
                     component: new Component(),
-                    name: "",
                     callback: function () {
                     }
                 });
@@ -308,7 +265,7 @@ describe("dflo", function () {
 
                 expect(function () {
                     mockPort.connect(outputs[0]);
-                }).toThrow("Invalid argument: port, InputPort required.")
+                }).toThrow("Invalid argument: port, InputPort required.");
 
                 expect(function () {
                     outputs[0].connect(input);
