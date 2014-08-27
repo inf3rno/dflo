@@ -1,0 +1,53 @@
+text {
+    pointer-events: none;
+    font: 10px sans-serif;
+}
+
+.component > .container {
+    fill: #fff;
+    stroke: #000;
+    stroke-width: 2px;
+}
+
+.component > .icon {
+    fill: #000;
+}
+
+.component.subscriber > .container {
+    fill: #000;
+    stroke: #ccc;
+}
+
+.component.subscriber > .icon {
+    fill: #fff;
+}
+
+.component > text {
+    font-weight: bold;
+}
+
+.port {
+    stroke: #555;
+    stroke-width: 1px;
+    cursor: pointer;
+}
+
+.input > .port {
+    fill: #000;
+}
+
+.output > .port {
+    fill: #fff;
+}
+
+marker {
+    stroke: #ccc;
+    stroke-width: 1px;
+    fill: #000;
+}
+
+.link {
+    fill: none;
+    stroke-width: 2px;
+    stroke: #555;
+}

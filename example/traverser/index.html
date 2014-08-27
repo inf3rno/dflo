@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Graph Figure Builder</title>
+    <script src="../../release/dflo.browser.recent.js"></script>
+    <script src="../../vendor/d3.min.js"></script>
+    <script src="graphview.js"></script>
+    <link rel="stylesheet" href="graphview.css"/>
+</head>
+<body>
+<script>
+
+    //some random network of nodes
+
+    var Publisher = dflo.Publisher;
+    var Subscriber = dflo.Subscriber;
+
+    var pub1 = new Publisher();
+    var pub2 = new Publisher();
+    var sub1 = new Subscriber({
+        callback: function () {
+        }
+    });
+    var sub2 = new Subscriber({
+        callback: function () {
+        }
+    });
+    var sub3 = new Subscriber();
+
+    pub1.connect(sub1);
+    pub1.connect(sub2);
+    pub2.connect(sub2);
+    pub2.connect(sub3);
+
+
+    //traversing the network and displaying a network graph
+
+    var Traverser = dflo.Traverser;
+    var DataBuilder = example.DataBuilder;
+    var GraphView = example.GraphView;
+
+    var traverser = new Traverser();
+    var dataBuilder = new DataBuilder();
+    traverser.connect(new Subscriber({
+        callback: dataBuilder.next,
+        context: dataBuilder
+    }));
+    traverser.traverse(sub2);
+
+    var view = new GraphView(dataBuilder.getData());
+    view.render();
+
+    //need some drag-drop to arrange the nodes, because this is not a clustered multi-force layout, which considers ports, but I can live with that
+
+</script>
+</body>
+</html>

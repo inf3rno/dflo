@@ -13,6 +13,8 @@ should be solved with dataflow-based code islands.
 ## Examples
 
  - [Observer pattern](test/example.observer.spec.js)
+ - [Traversing network graph](example/traverser/index.html)
+  ![Traversing network graph example preview](example/traverser/preview.png?raw=true "preview")
 
 ## Documentation
 
