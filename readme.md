@@ -12,9 +12,84 @@ should be solved with dataflow-based code islands.
 
 ## Examples
 
- - [Observer pattern](test/example.observer.spec.js)
- - [Traversing network graph](example/traverser/index.html)
-  ![Traversing network graph example preview](example/traverser/preview.png?raw=true "preview")
+### Observer pattern
+
+```js
+
+    var Subject = Class.extend({
+        init: function (state) {
+            this.publisher = new Publisher();
+            this.state = state;
+        },
+        changeState: function (state) {
+            this.state = state;
+            this.notifyObservers();
+        },
+        registerObserver: function (observer) {
+            this.publisher.connect(observer.subscriber);
+        },
+        unregisterObserver: function (observer) {
+            this.publisher.disconnect(observer.subscriber);
+        },
+        notifyObservers: function () {
+            this.publisher.publish(this.state);
+        }
+    });
+
+    var Observer = Class.extend({
+        init: function () {
+            this.subscriber = new Subscriber({
+                callback: this.notify,
+                context: this
+            });
+        },
+        notify: function (state) {
+            //updating the observer using the subject's new state
+        }
+    });
+```
+
+[The example code is available here as a jasmine test.](test/example.observer.spec.js)
+
+### Traversing network graph
+
+A simple d3 force layout using the `Traverser` component as data source.
+It displays the network graph using SVG. By the following network:
+
+```js
+
+    var Publisher = dflo.Publisher;
+    var Subscriber = dflo.Subscriber;
+
+    var pub1 = new Publisher();
+    var pub2 = new Publisher();
+    var sub1 = new Subscriber({
+        callback: function () {
+        }
+    });
+    var sub2 = new Subscriber({
+        callback: function () {
+        }
+    });
+    var sub3 = new Subscriber();
+
+    pub1.connect(sub1);
+    pub1.connect(sub2);
+    pub2.connect(sub2);
+    pub2.connect(sub3);
+```
+
+the results will be something like this
+
+![Traversing network graph example preview](example/traverser/preview.png?raw=true "preview")
+
+after arranging the nodes for a short while with drag&drop.
+
+This is just a simple force layout, not a multi-force layout, which considers the position of the ports and the link-component overlaps, etc.
+So it won't move the nodes in the perfect position.
+
+[The example code is available here.](example/traverser/index.html)
+*note: You'll need a dflo.js file for browsers to run it.*
 
 ## Documentation
 
