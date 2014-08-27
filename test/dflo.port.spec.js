@@ -28,19 +28,6 @@ describe("dflo", function () {
 
         });
 
-        describe("label", function () {
-
-            it("is a string given in the config", function () {
-
-                var port1 = new MockPort({
-                    component: new Component(),
-                    label: "something"
-                });
-                expect(port1.label).toBe("something");
-            });
-
-        });
-
         describe("connections", function () {
 
             it("can be traversed from both side of the connection", function () {

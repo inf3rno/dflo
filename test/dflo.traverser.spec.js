@@ -30,9 +30,9 @@ describe("dflo", function () {
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, subscriber1);
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, subscriber2);
 
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher.ports.stdout);
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber1.ports.stdin);
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber2.ports.stdin);
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher.ports.stdout, "stdout");
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber1.ports.stdin, "stdin");
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber2.ports.stdin, "stdin");
 
                 expect(log).toHaveBeenCalledWith(Traverser.CONNECTION, publisher.ports.stdout, subscriber1.ports.stdin);
                 expect(log).toHaveBeenCalledWith(Traverser.CONNECTION, publisher.ports.stdout, subscriber2.ports.stdin);
@@ -64,9 +64,9 @@ describe("dflo", function () {
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, publisher2);
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, subscriber);
 
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher1.ports.stdout);
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher2.ports.stdout);
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber.ports.stdin);
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher1.ports.stdout, "stdout");
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher2.ports.stdout, "stdout");
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber.ports.stdin, "stdin");
 
                 expect(log).toHaveBeenCalledWith(Traverser.CONNECTION, publisher1.ports.stdout, subscriber.ports.stdin);
                 expect(log).toHaveBeenCalledWith(Traverser.CONNECTION, publisher2.ports.stdout, subscriber.ports.stdin);
@@ -97,9 +97,9 @@ describe("dflo", function () {
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, publisher2);
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, subscriber);
 
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher1.ports.stdout);
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher2.ports.stdout);
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber.ports.stdin);
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher1.ports.stdout, "stdout");
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher2.ports.stdout, "stdout");
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber.ports.stdin, "stdin");
 
                 expect(log).toHaveBeenCalledWith(Traverser.CONNECTION, publisher1.ports.stdout, subscriber.ports.stdin);
                 expect(log).toHaveBeenCalledWith(Traverser.CONNECTION, publisher2.ports.stdout, subscriber.ports.stdin);
@@ -132,10 +132,10 @@ describe("dflo", function () {
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, subscriber1);
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, subscriber2);
 
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher1.ports.stdout);
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher2.ports.stdout);
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber1.ports.stdin);
-                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber2.ports.stdin);
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher1.ports.stdout, "stdout");
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, publisher2.ports.stdout, "stdout");
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber1.ports.stdin, "stdin");
+                expect(log).toHaveBeenCalledWith(Traverser.PORT, subscriber2.ports.stdin, "stdin");
 
                 expect(log).toHaveBeenCalledWith(Traverser.CONNECTION, publisher1.ports.stdout, subscriber1.ports.stdin);
                 expect(log).toHaveBeenCalledWith(Traverser.CONNECTION, publisher1.ports.stdout, subscriber2.ports.stdin);
@@ -168,15 +168,15 @@ describe("dflo", function () {
                 traverser.traverse(publisher1);
 
                 expect(log[0]).toEqual([Traverser.COMPONENT, publisher1]);
-                expect(log[1]).toEqual([Traverser.PORT, publisher1.ports.stdout]);
+                expect(log[1]).toEqual([Traverser.PORT, publisher1.ports.stdout, "stdout"]);
                 expect(log[2]).toEqual([Traverser.COMPONENT, subscriber1]);
-                expect(log[3]).toEqual([Traverser.PORT, subscriber1.ports.stdin]);
+                expect(log[3]).toEqual([Traverser.PORT, subscriber1.ports.stdin, "stdin"]);
                 expect(log[4]).toEqual([Traverser.CONNECTION, publisher1.ports.stdout, subscriber1.ports.stdin]);
                 expect(log[5]).toEqual([Traverser.COMPONENT, subscriber2]);
-                expect(log[6]).toEqual([Traverser.PORT, subscriber2.ports.stdin]);
+                expect(log[6]).toEqual([Traverser.PORT, subscriber2.ports.stdin, "stdin"]);
                 expect(log[7]).toEqual([Traverser.CONNECTION, publisher1.ports.stdout, subscriber2.ports.stdin]);
                 expect(log[8]).toEqual([Traverser.COMPONENT, publisher2]);
-                expect(log[9]).toEqual([Traverser.PORT, publisher2.ports.stdout]);
+                expect(log[9]).toEqual([Traverser.PORT, publisher2.ports.stdout, "stdout"]);
                 expect(log[10]).toEqual([Traverser.CONNECTION, publisher2.ports.stdout, subscriber1.ports.stdin]);
                 expect(log[11]).toEqual([Traverser.CONNECTION, publisher2.ports.stdout, subscriber2.ports.stdin]);
 

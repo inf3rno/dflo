@@ -73,20 +73,16 @@ var Message = Class.extend({
 
 var Component = Class.extend({
     id: undefined,
-    label: "Component",
     ports: undefined,
     init: function (config) {
         this.id = uniqueId();
         this.ports = {};
-        if (config && typeof (config.label) == "string")
-            this.label = config.label;
     }
 });
 
 var Port = Class.extend({
     id: undefined,
     component: undefined,
-    label: "Port",
     connections: undefined,
     init: function (config) {
         if (this.constructor === Port)
@@ -100,8 +96,6 @@ var Port = Class.extend({
         if (!(config.component instanceof Component))
             throw new Error("Invalid arguments: config.component, Component required.");
         this.component = config.component;
-        if (typeof(config.label) == "string")
-            this.label = config.label;
     },
     connect: function (port) {
         if (!(port instanceof Port))
@@ -129,7 +123,6 @@ var Port = Class.extend({
 });
 
 var InputPort = Port.extend({
-    label: "InputPort",
     callback: undefined,
     context: undefined,
     init: function (config) {
@@ -152,7 +145,6 @@ var InputPort = Port.extend({
 });
 
 var OutputPort = Port.extend({
-    label: "OutputPort",
     connect: function (port) {
         if (!(port instanceof InputPort))
             throw new Error("Invalid argument: port, InputPort required.");
@@ -169,12 +161,10 @@ var OutputPort = Port.extend({
 });
 
 var Publisher = Component.extend({
-    label: "Publisher",
     init: function (config) {
         Component.prototype.init.apply(this, arguments);
         this.ports.stdout = new OutputPort({
-            component: this,
-            label: "Standard Output"
+            component: this
         });
     },
     publish: function () {
@@ -201,12 +191,10 @@ var Publisher = Component.extend({
 });
 
 var Subscriber = Component.extend({
-    label: "Subscriber",
     init: function (config) {
         Component.prototype.init.apply(this, arguments);
         this.ports.stdin = new InputPort({
             component: this,
-            label: "Standard Input",
             callback: this.notifyCallback,
             context: this
         });
@@ -226,7 +214,6 @@ var Subscriber = Component.extend({
 
 
 var Traverser = Publisher.extend({
-    label: "Traverser",
     traverse: function (component) {
         if (!(component instanceof Component))
             throw new Error("Invalid argument: origin, Component required.");
@@ -245,7 +232,7 @@ var Traverser = Publisher.extend({
             var port = component.ports[portName];
             if (port.id in visited)
                 continue;
-            this.publish(Traverser.PORT, port);
+            this.publish(Traverser.PORT, port, portName);
             for (var remotePortId in port.connections) {
                 var remotePort = port.connections[remotePortId];
                 if (!(remotePort.id in visited)) {
