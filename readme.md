@@ -26,10 +26,10 @@ should be solved with dataflow-based code islands.
             this.notifyObservers();
         },
         registerObserver: function (observer) {
-            this.publisher.connect(observer.subscriber);
+            this.publisher.ports.stdout.connect(observer.subscriber.ports.stdin);
         },
         unregisterObserver: function (observer) {
-            this.publisher.disconnect(observer.subscriber);
+            this.publisher.ports.stdout.disconnect(observer.subscriber.ports.stdin);
         },
         notifyObservers: function () {
             this.publisher.publish(this.state);
@@ -73,10 +73,10 @@ It displays the network graph using SVG. By the following network:
     });
     var sub3 = new Subscriber();
 
-    pub1.connect(sub1);
-    pub1.connect(sub2);
-    pub2.connect(sub2);
-    pub2.connect(sub3);
+    pub1.ports.stdout.connect(sub1.ports.stdin);
+    pub1.ports.stdout.connect(sub2.ports.stdin);
+    pub2.ports.stdout.connect(sub2.ports.stdin);
+    pub2.ports.stdout.connect(sub3.ports.stdin);
 ```
 
 the results will be something like this

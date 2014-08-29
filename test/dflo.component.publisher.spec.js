@@ -31,29 +31,9 @@ describe("dflo", function () {
             it("sends messages to the stdin of other components", function () {
                 var publisher = new Publisher();
                 var logger = createLogger();
-                publisher.connect(logger.component);
+                publisher.ports.stdout.connect(logger.component.ports.stdin);
                 publisher.publish(1, 2, 3);
                 expect(logger.spy).toHaveBeenCalledWith(1, 2, 3);
-            });
-
-        });
-
-        describe("disconnect()", function () {
-
-            it("disconnects stdin of other components", function () {
-
-                var publisher = new Publisher();
-                var logger1 = createLogger();
-                var logger2 = createLogger();
-                publisher.connect(logger1.component);
-                publisher.connect(logger2.component);
-                publisher.publish(1, 2, 3);
-                expect(logger1.spy).toHaveBeenCalledWith(1, 2, 3);
-                expect(logger2.spy).toHaveBeenCalledWith(1, 2, 3);
-                publisher.disconnect(logger1.component);
-                publisher.publish(4, 5, 6);
-                expect(logger1.spy).not.toHaveBeenCalledWith(4, 5, 6);
-                expect(logger2.spy).toHaveBeenCalledWith(4, 5, 6);
             });
 
         });

@@ -171,22 +171,6 @@ var Publisher = Component.extend({
         var data = [].slice.apply(arguments);
         var message = new Message(data);
         this.ports.stdout.relay(message);
-    },
-    connect: function (component) {
-        var input = this.findInputPort(component);
-        this.ports.stdout.connect(input);
-    },
-    disconnect: function (component) {
-        var input = this.findInputPort(component);
-        this.ports.stdout.disconnect(input);
-    },
-    findInputPort: function (component) {
-        if (!(component instanceof Component))
-            throw new Error("Invalid argument: component, Component required.");
-        var input = component.ports.stdin;
-        if (!(input instanceof InputPort))
-            throw new Error("Cannot find input port on the given component.");
-        return input;
     }
 });
 
@@ -298,18 +282,6 @@ var Transformer = Component.extend({
             }
         }.bind(this);
         this.callback.call(this.context, incoming.data, done);
-    },
-    connect: function (component) {
-        if (component.ports.stdin)
-            this.ports.stdout.connect(component.ports.stdin);
-        if (component.ports.stdout)
-            this.ports.stdin.connect(component.ports.stdout);
-    },
-    disconnect: function (component) {
-        if (component.ports.stdin)
-            this.ports.stdout.disconnect(component.ports.stdin);
-        if (component.ports.stdout)
-            this.ports.stdin.disconnect(component.ports.stdout);
     }
 });
 

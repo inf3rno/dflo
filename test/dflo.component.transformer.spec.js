@@ -25,8 +25,8 @@ describe("dflo", function () {
             var subscriber = new Subscriber({
                 callback: log
             });
-            publisher.connect(summarizer);
-            summarizer.connect(subscriber);
+            publisher.ports.stdout.connect(summarizer.ports.stdin);
+            summarizer.ports.stdout.connect(subscriber.ports.stdin);
 
             runs(function () {
                 publisher.publish(1, 2, 3);
@@ -47,7 +47,7 @@ describe("dflo", function () {
                     done(data);
                 }
             });
-            publisher.connect(transformer);
+            publisher.ports.stdout.connect(transformer.ports.stdin);
 
             expect(function () {
                 publisher.publish(0, 1, 2);
@@ -61,7 +61,7 @@ describe("dflo", function () {
                     done(1);
                 }
             });
-            publisher.connect(transformer);
+            publisher.ports.stdout.connect(transformer.ports.stdin);
 
             expect(function () {
                 publisher.publish();
@@ -89,8 +89,8 @@ describe("dflo", function () {
             var subscriber2 = new Subscriber({
                 callback: err
             });
-            publisher.connect(transformer);
-            transformer.connect(subscriber);
+            publisher.ports.stdout.connect(transformer.ports.stdin);
+            transformer.ports.stdout.connect(subscriber.ports.stdin);
             transformer.ports.stderr.connect(subscriber2.ports.stdin);
 
             publisher.publish(6, 3);
@@ -111,7 +111,7 @@ describe("dflo", function () {
                     done(null, 1);
                 }
             });
-            publisher.connect(transformer);
+            publisher.ports.stdout.connect(transformer.ports.stdin);
             expect(function () {
                 publisher.publish();
             }).toThrow("Invalid error data, Array required.")

@@ -17,10 +17,10 @@ describe("examples", function () {
                 this.notifyObservers();
             },
             registerObserver: function (observer) {
-                this.publisher.connect(observer.subscriber);
+                this.publisher.ports.stdout.connect(observer.subscriber.ports.stdin);
             },
             unregisterObserver: function (observer) {
-                this.publisher.disconnect(observer.subscriber);
+                this.publisher.ports.stdout.disconnect(observer.subscriber.ports.stdin);
             },
             notifyObservers: function () {
                 this.publisher.publish(this.state);

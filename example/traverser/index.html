@@ -27,10 +27,10 @@
     });
     var sub3 = new Subscriber();
 
-    pub1.connect(sub1);
-    pub1.connect(sub2);
-    pub2.connect(sub2);
-    pub2.connect(sub3);
+    pub1.ports.stdout.connect(sub1.ports.stdin);
+    pub1.ports.stdout.connect(sub2.ports.stdin);
+    pub2.ports.stdout.connect(sub2.ports.stdin);
+    pub2.ports.stdout.connect(sub3.ports.stdin);
 
 
     //traversing the network and displaying a network graph
@@ -41,10 +41,10 @@
 
     var traverser = new Traverser();
     var dataBuilder = new DataBuilder();
-    traverser.connect(new Subscriber({
+    traverser.ports.stdout.connect(new Subscriber({
         callback: dataBuilder.next,
         context: dataBuilder
-    }));
+    }).ports.stdin);
     traverser.traverse(sub2);
 
     var view = new GraphView(dataBuilder.getData());

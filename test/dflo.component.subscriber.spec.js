@@ -16,7 +16,7 @@ describe("dflo", function () {
                 var subscriber = new Subscriber({
                     callback: log
                 });
-                publisher.connect(subscriber);
+                publisher.ports.stdout.connect(subscriber.ports.stdin);
                 publisher.publish(4, 5, 6);
                 expect(log).not.toHaveBeenCalledWith(1, 2, 3);
                 expect(log).toHaveBeenCalledWith(4, 5, 6);

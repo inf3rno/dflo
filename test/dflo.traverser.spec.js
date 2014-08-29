@@ -15,15 +15,15 @@ describe("dflo", function () {
                 var subscriber1 = new Subscriber();
                 var subscriber2 = new Subscriber();
                 var subscriber3 = new Subscriber();
-                publisher.connect(subscriber1);
-                publisher.connect(subscriber2);
+                publisher.ports.stdout.connect(subscriber1.ports.stdin);
+                publisher.ports.stdout.connect(subscriber2.ports.stdin);
 
                 var traverser = new Traverser();
                 var log = jasmine.createSpy();
                 var logger = new Subscriber({
                     callback: log
                 });
-                traverser.connect(logger);
+                traverser.ports.stdout.connect(logger.ports.stdin);
                 traverser.traverse(publisher);
 
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, publisher);
@@ -49,15 +49,15 @@ describe("dflo", function () {
                 var publisher2 = new Publisher();
                 var subscriber = new Subscriber();
 
-                publisher1.connect(subscriber);
-                publisher2.connect(subscriber);
+                publisher1.ports.stdout.connect(subscriber.ports.stdin);
+                publisher2.ports.stdout.connect(subscriber.ports.stdin);
 
                 var traverser = new Traverser();
                 var log = jasmine.createSpy();
                 var logger = new Subscriber({
                     callback: log
                 });
-                traverser.connect(logger);
+                traverser.ports.stdout.connect(logger.ports.stdin);
                 traverser.traverse(subscriber);
 
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, publisher1);
@@ -82,15 +82,15 @@ describe("dflo", function () {
                 var publisher2 = new Publisher();
                 var subscriber = new Subscriber();
 
-                publisher1.connect(subscriber);
-                publisher2.connect(subscriber);
+                publisher1.ports.stdout.connect(subscriber.ports.stdin);
+                publisher2.ports.stdout.connect(subscriber.ports.stdin);
 
                 var traverser = new Traverser();
                 var log = jasmine.createSpy();
                 var logger = new Subscriber({
                     callback: log
                 });
-                traverser.connect(logger);
+                traverser.ports.stdout.connect(logger.ports.stdin);
                 traverser.traverse(publisher1);
 
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, publisher1);
@@ -114,17 +114,17 @@ describe("dflo", function () {
                 var subscriber1 = new Subscriber();
                 var subscriber2 = new Subscriber();
 
-                publisher1.connect(subscriber1);
-                publisher1.connect(subscriber2);
-                publisher2.connect(subscriber1);
-                publisher2.connect(subscriber2);
+                publisher1.ports.stdout.connect(subscriber1.ports.stdin);
+                publisher1.ports.stdout.connect(subscriber2.ports.stdin);
+                publisher2.ports.stdout.connect(subscriber1.ports.stdin);
+                publisher2.ports.stdout.connect(subscriber2.ports.stdin);
 
                 var traverser = new Traverser();
                 var log = jasmine.createSpy();
                 var logger = new Subscriber({
                     callback: log
                 });
-                traverser.connect(logger);
+                traverser.ports.stdout.connect(logger.ports.stdin);
                 traverser.traverse(publisher1);
 
                 expect(log).toHaveBeenCalledWith(Traverser.COMPONENT, publisher1);
@@ -152,10 +152,10 @@ describe("dflo", function () {
                 var subscriber1 = new Subscriber();
                 var subscriber2 = new Subscriber();
 
-                publisher1.connect(subscriber1);
-                publisher1.connect(subscriber2);
-                publisher2.connect(subscriber1);
-                publisher2.connect(subscriber2);
+                publisher1.ports.stdout.connect(subscriber1.ports.stdin);
+                publisher1.ports.stdout.connect(subscriber2.ports.stdin);
+                publisher2.ports.stdout.connect(subscriber1.ports.stdin);
+                publisher2.ports.stdout.connect(subscriber2.ports.stdin);
 
                 var traverser = new Traverser();
                 var log = [];
@@ -164,7 +164,7 @@ describe("dflo", function () {
                         log.push([].slice.apply(arguments));
                     }
                 });
-                traverser.connect(logger);
+                traverser.ports.stdout.connect(logger.ports.stdin);
                 traverser.traverse(publisher1);
 
                 expect(log[0]).toEqual([Traverser.COMPONENT, publisher1]);
