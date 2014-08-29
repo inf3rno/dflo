@@ -17,8 +17,7 @@ describe("dflo", function () {
                     expect(message instanceof Message).toBe(true);
                     spy.apply(null, message.data);
                 },
-                component: component,
-                name: ""
+                component: component
             });
 
             return {
