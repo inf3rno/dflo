@@ -73,10 +73,9 @@ It displays the network graph using SVG. By the following network:
     });
     var sub3 = new Subscriber();
 
-    pub1.ports.stdout.connect(sub1.ports.stdin);
-    pub1.ports.stdout.connect(sub2.ports.stdin);
-    pub2.ports.stdout.connect(sub2.ports.stdin);
-    pub2.ports.stdout.connect(sub3.ports.stdin);
+    var build = new Builder();
+    build.connectAll(pub1.ports.stdout, sub1.ports.stdin, sub2.ports.stdin);
+    build.connectAll(pub2.ports.stdout, sub2.ports.stdin, sub3.ports.stdin);
 ```
 
 the results will be something like this
