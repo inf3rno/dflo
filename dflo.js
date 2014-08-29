@@ -279,6 +279,29 @@ var Transformer = Component.extend({
     }
 });
 
+var Builder = Component.extend({
+    init: function (config) {
+        Component.prototype.init.apply(this, arguments);
+    },
+    connectAll: function () {
+        var inputs = [];
+        var outputs = [];
+        [].forEach.call(arguments, function (port) {
+            if (port instanceof InputPort)
+                inputs.push(port);
+            else if (port instanceof OutputPort)
+                outputs.push(port);
+            else
+                throw new Error(warning.PORT_INVALID);
+        });
+        outputs.forEach(function (output) {
+            inputs.forEach(function (input) {
+                output.connect(input);
+            });
+        });
+    }
+});
+
 var warning = {
     ABSTRACT_CLASS_INSTANTIATION: "Tried to instantiate an abstract class.",
     ABSTRACT_METHOD_CALL: "Tried to call an abstract method.",
@@ -309,6 +332,7 @@ var dflo = {
     Subscriber: Subscriber,
     Traverser: Traverser,
     Transformer: Transformer,
+    Builder: Builder,
     warning: warning
 };
 
