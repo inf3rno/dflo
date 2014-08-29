@@ -14,23 +14,46 @@
 
     var Publisher = dflo.Publisher;
     var Subscriber = dflo.Subscriber;
+    var Transformer = dflo.Transformer;
     var Builder = dflo.Builder;
 
-    var pub1 = new Publisher();
-    var pub2 = new Publisher();
-    var sub1 = new Subscriber({
-        callback: function () {
+    var usableData = new Publisher();
+    var rawData = new Publisher();
+    var resultLogger = new Subscriber({
+        callback: function (result) {
+            console.log(result);
         }
     });
-    var sub2 = new Subscriber({
-        callback: function () {
+    var errorLogger = new Subscriber({
+        callback: function (err) {
+            console.error(err);
         }
     });
-    var sub3 = new Subscriber();
+    var raw2usable = new Transformer({
+        callback: function (raw, done) {
+            //do something to prepare raw data for the transformation
+            if (err)
+                done(null, err);
+            else
+                done(usable);
+        }
+    });
+    var usable2Result = new Transformer({
+        callback: function (usable, done) {
+            //real transformation
+            if (err)
+                done(null, err);
+            else
+                done(result);
+        }
+    });
 
-    var build = new Builder();
-    build.connectAll(pub1.ports.stdout, sub1.ports.stdin, sub2.ports.stdin);
-    build.connectAll(pub2.ports.stdout, sub2.ports.stdin, sub3.ports.stdin);
+    var builder = new Builder();
+    builder.connectAll(rawData.ports.stdout, raw2usable.ports.stdin);
+    builder.connectAll(raw2usable.ports.stdout, usable2Result.ports.stdin);
+    builder.connectAll(usableData.ports.stdout, usable2Result.ports.stdin);
+    builder.connectAll(raw2usable.ports.stderr, usable2Result.ports.stderr, errorLogger.ports.stdin);
+    builder.connectAll(usable2Result.ports.stdout, resultLogger.ports.stdin);
 
     //traversing the network and displaying a network graph
 
@@ -44,7 +67,7 @@
         callback: dataBuilder.next,
         context: dataBuilder
     }).ports.stdin);
-    traverser.traverse(sub2);
+    traverser.traverse(resultLogger);
 
     var view = new GraphView(dataBuilder.getData());
     view.render();

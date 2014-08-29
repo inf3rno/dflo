@@ -54,38 +54,55 @@ should be solved with dataflow-based code islands.
 ### Traversing network graph
 
 A simple d3 force layout using the `Traverser` component as data source.
-It displays the network graph using SVG. By the following network:
+It displays the network graph using SVG. For example by the following network:
 
 ```js
 
-    var Publisher = dflo.Publisher;
-    var Subscriber = dflo.Subscriber;
-
-    var pub1 = new Publisher();
-    var pub2 = new Publisher();
-    var sub1 = new Subscriber({
-        callback: function () {
+    var usableData = new Publisher();
+    var rawData = new Publisher();
+    var resultLogger = new Subscriber({
+        callback: function (result) {
+            console.log(result);
         }
     });
-    var sub2 = new Subscriber({
-        callback: function () {
+    var errorLogger = new Subscriber({
+        callback: function (err) {
+            console.error(err);
         }
     });
-    var sub3 = new Subscriber();
+    var raw2usable = new Transformer({
+        callback: function (raw, done) {
+            //do something to prepare raw data for the transformation
+            if (err)
+                done(null, err);
+            else
+                done(usable);
+        }
+    });
+    var usable2Result = new Transformer({
+        callback: function (usable, done) {
+            //real transformation
+            if (err)
+                done(null, err);
+            else
+                done(result);
+        }
+    });
 
-    var build = new Builder();
-    build.connectAll(pub1.ports.stdout, sub1.ports.stdin, sub2.ports.stdin);
-    build.connectAll(pub2.ports.stdout, sub2.ports.stdin, sub3.ports.stdin);
+    var builder = new Builder();
+    builder.connectAll(rawData.ports.stdout, raw2usable.ports.stdin);
+    builder.connectAll(raw2usable.ports.stdout, usable2Result.ports.stdin);
+    builder.connectAll(usableData.ports.stdout, usable2Result.ports.stdin);
+    builder.connectAll(raw2usable.ports.stderr, usable2Result.ports.stderr, errorLogger.ports.stdin);
+    builder.connectAll(usable2Result.ports.stdout, resultLogger.ports.stdin);
 ```
 
-the results will be something like this
+the results will be something like this, after rearranging the nodes for a short while with drag&drop.
 
 ![Traversing network graph example preview](example/traverser/preview.png?raw=true "preview")
 
-after arranging the nodes for a short while with drag&drop.
-
 This is just a simple force layout, not a multi-force layout, which considers the position of the ports and the link-component overlaps, etc.
-So it won't move the nodes in the perfect position.
+So it won't move the nodes into the perfect position automatically.
 
 [The example code is available here.](example/traverser/index.html)
 *note: You'll need a dflo.js file for browsers to run it.*

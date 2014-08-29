@@ -22,6 +22,14 @@ text {
     fill: #fff;
 }
 
+.component.transformer > .container {
+    fill: #ff8;
+}
+
+.component.transformer > .icon {
+    fill: #00a;
+}
+
 .component > text {
     font-weight: bold;
 }
