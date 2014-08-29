@@ -261,6 +261,58 @@ Traverser.COMPONENT = 0;
 Traverser.PORT = 1;
 Traverser.CONNECTION = 2;
 
+var Transformer = Component.extend({
+    init: function (config) {
+        Component.prototype.init.apply(this, arguments);
+        this.ports.stdin = new InputPort({
+            component: this,
+            callback: this.transform,
+            context: this
+        });
+        this.ports.stdout = new OutputPort({
+            component: this
+        });
+        this.ports.stderr = new OutputPort({
+            component: this
+        });
+        if (!(config.callback instanceof Function))
+            throw new Error("Invalid argument: config.callback, Function required.");
+        this.callback = config.callback;
+        this.context = config.context;
+    },
+    transform: function (incoming) {
+        var done = function (data, error) {
+            if (data === incoming.data)
+                throw new Error("Transforming the incoming data array can have unexpected results, so it is not allowed.");
+            if (error) {
+                if (error instanceof Array)
+                    this.ports.stderr.relay(new Message(error));
+                else
+                    throw new Error("Invalid error data, Array required.");
+            }
+            else {
+                if (data instanceof Array)
+                    this.ports.stdout.relay(new Message(data));
+                else
+                    throw new Error("Invalid results, Array required.");
+            }
+        }.bind(this);
+        this.callback.call(this.context, incoming.data, done);
+    },
+    connect: function (component) {
+        if (component.ports.stdin)
+            this.ports.stdout.connect(component.ports.stdin);
+        if (component.ports.stdout)
+            this.ports.stdin.connect(component.ports.stdout);
+    },
+    disconnect: function (component) {
+        if (component.ports.stdin)
+            this.ports.stdout.disconnect(component.ports.stdin);
+        if (component.ports.stdout)
+            this.ports.stdin.disconnect(component.ports.stdout);
+    }
+});
+
 var dflo = {
     Class: Class,
     Sequence: Sequence,
@@ -272,7 +324,8 @@ var dflo = {
     Component: Component,
     Publisher: Publisher,
     Subscriber: Subscriber,
-    Traverser: Traverser
+    Traverser: Traverser,
+    Transformer: Transformer
 };
 
 module.exports = dflo;
