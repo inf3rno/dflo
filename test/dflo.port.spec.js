@@ -3,7 +3,8 @@ var dflo = require("../dflo"),
     InputPort = dflo.InputPort,
     OutputPort = dflo.OutputPort,
     Message = dflo.Message,
-    Component = dflo.Component;
+    Component = dflo.Component,
+    warning = dflo.warning;
 
 describe("dflo", function () {
 
@@ -50,13 +51,13 @@ describe("dflo", function () {
             it("requires a Component instance as component", function () {
                 expect(function () {
                     new MockPort({});
-                }).toThrow("Invalid arguments: config.component is required.");
+                }).toThrow(warning.CONFIG_COMPONENT_REQUIRED);
 
                 expect(function () {
                     new MockPort({
                         component: {}
                     });
-                }).toThrow("Invalid arguments: config.component, Component required.");
+                }).toThrow(warning.CONFIG_COMPONENT_INVALID);
 
                 expect(function () {
                     new MockPort({
@@ -98,7 +99,7 @@ describe("dflo", function () {
                         component: new Component(),
                         callback: {}
                     });
-                }).toThrow("Invalid arguments: config.callback, Function required.");
+                }).toThrow(warning.CONFIG_CALLBACK_INVALID);
 
                 expect(function () {
                     new InputPort({
@@ -135,7 +136,7 @@ describe("dflo", function () {
                 });
                 expect(function () {
                     port.relay({});
-                }).toThrow("Invalid argument: message, Message required.");
+                }).toThrow(warning.MESSAGE_INVALID);
 
             });
 
@@ -160,11 +161,11 @@ describe("dflo", function () {
                 });
                 expect(function () {
                     inputs[0].connect(inputs[1]);
-                }).toThrow("Invalid argument: port, OutputPort required.");
+                }).toThrow(warning.OUTPUT_PORT_INVALID);
 
                 expect(function () {
                     mockPort.connect(inputs[0]);
-                }).toThrow("Invalid argument: port, OutputPort required.")
+                }).toThrow(warning.OUTPUT_PORT_INVALID)
 
                 expect(function () {
                     inputs[0].connect(output);
@@ -223,7 +224,7 @@ describe("dflo", function () {
                 });
                 expect(function () {
                     port.relay({});
-                }).toThrow("Invalid argument: message, Message required.");
+                }).toThrow(warning.MESSAGE_INVALID);
 
             });
 
@@ -248,11 +249,11 @@ describe("dflo", function () {
                 });
                 expect(function () {
                     outputs[0].connect(outputs[1]);
-                }).toThrow("Invalid argument: port, InputPort required.");
+                }).toThrow(warning.INPUT_PORT_INVALID);
 
                 expect(function () {
                     mockPort.connect(outputs[0]);
-                }).toThrow("Invalid argument: port, InputPort required.");
+                }).toThrow(warning.INPUT_PORT_INVALID);
 
                 expect(function () {
                     outputs[0].connect(input);

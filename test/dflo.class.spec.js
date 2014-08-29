@@ -1,22 +1,18 @@
 var dflo = require("../dflo"),
     Class = dflo.Class,
-    abstractMethod = Class.abstractMethod;
+    abstractMethod = Class.abstractMethod,
+    warning = dflo.warning;
 
 describe("dflo", function () {
 
     describe("Class", function () {
-
-        var warningMessages = {
-            abstractClassInstantiation: "Tried to instantiate an abstract class.",
-            abstractMethodCall: "Tried to call an abstract method."
-        };
 
         describe("Class()", function () {
 
             it("throws exception by initialization", function () {
                 expect(function () {
                     new Class();
-                }).toThrow(warningMessages.abstractClassInstantiation);
+                }).toThrow(warning.ABSTRACT_CLASS_INSTANTIATION);
             });
 
         });
@@ -27,7 +23,7 @@ describe("dflo", function () {
                 var Descendant = Class.extend();
                 expect(function () {
                     new Descendant();
-                }).toThrow(warningMessages.abstractClassInstantiation);
+                }).toThrow(warning.ABSTRACT_CLASS_INSTANTIATION);
             });
 
             it("does not keep the abstract init if it is overridden", function () {
@@ -92,7 +88,7 @@ describe("dflo", function () {
                 expect(function () {
                     var instance = new Descendant();
                     instance.method();
-                }).toThrow(warningMessages.abstractMethodCall);
+                }).toThrow(warning.ABSTRACT_METHOD_CALL);
             });
 
             it("uses prototypal inheritance, so by the instances the instanceOf works on both of the ancestor and descendant", function () {

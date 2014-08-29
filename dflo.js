@@ -14,19 +14,14 @@ var extend = function (Ancestor, properties) {
     return Descendant;
 };
 
-var abstractMethod = function () {
-    throw new SyntaxError("Tried to call an abstract method.");
+var Class = extend(Object);
+Class.abstractInit = function () {
+    throw new SyntaxError(warning.ABSTRACT_CLASS_INSTANTIATION);
 };
-var abstractInit = function () {
-    throw new SyntaxError("Tried to instantiate an abstract class.");
+Class.prototype.init = Class.abstractInit;
+Class.abstractMethod = function () {
+    throw new SyntaxError(warning.ABSTRACT_METHOD_CALL);
 };
-
-var Class = extend(Object, {
-    init: abstractInit
-});
-Class.abstractInit = abstractInit;
-Class.abstractMethod = abstractMethod;
-
 
 var Sequence = Class.extend({
     initial: undefined,
@@ -86,20 +81,20 @@ var Port = Class.extend({
     connections: undefined,
     init: function (config) {
         if (this.constructor === Port)
-            abstractInit();
+            Class.abstractInit();
         this.id = uniqueId();
         this.connections = {};
         if (!config)
-            throw new Error("Invalid arguments: config is required.");
+            throw new Error(warning.CONFIG_REQUIRED);
         if (!(config.component))
-            throw new Error("Invalid arguments: config.component is required.");
+            throw new Error(warning.CONFIG_COMPONENT_REQUIRED);
         if (!(config.component instanceof Component))
-            throw new Error("Invalid arguments: config.component, Component required.");
+            throw new Error(warning.CONFIG_COMPONENT_INVALID);
         this.component = config.component;
     },
     connect: function (port) {
         if (!(port instanceof Port))
-            throw new Error("Invalid arguments: port, Port required.");
+            throw new Error(warning.PORT_INVALID);
         if (this.isConnected(port))
             return;
         this.connections[port.id] = port;
@@ -108,7 +103,7 @@ var Port = Class.extend({
     },
     disconnect: function (port) {
         if (!(port instanceof Port))
-            throw new Error("Invalid arguments: port, Port required.");
+            throw new Error(warning.PORT_INVALID);
         if (this.isConnected(port))
             delete(this.connections[port.id]);
         if (port.isConnected(this))
@@ -116,10 +111,10 @@ var Port = Class.extend({
     },
     isConnected: function (port) {
         if (!(port instanceof Port))
-            throw new Error("Invalid arguments: port, Port required.");
+            throw new Error(warning.PORT_INVALID);
         return (port.id in this.connections);
     },
-    relay: abstractMethod
+    relay: Class.abstractMethod
 });
 
 var InputPort = Port.extend({
@@ -128,18 +123,18 @@ var InputPort = Port.extend({
     init: function (config) {
         Port.prototype.init.apply(this, arguments);
         if (!(config.callback instanceof Function))
-            throw new Error("Invalid arguments: config.callback, Function required.");
+            throw new Error(warning.CONFIG_CALLBACK_INVALID);
         this.callback = config.callback;
         this.context = config.context;
     },
     connect: function (port) {
         if (!(port instanceof OutputPort))
-            throw new Error("Invalid argument: port, OutputPort required.");
+            throw new Error(warning.OUTPUT_PORT_INVALID);
         Port.prototype.connect.apply(this, arguments);
     },
     relay: function (message) {
         if (!(message instanceof Message))
-            throw new Error("Invalid argument: message, Message required.");
+            throw new Error(warning.MESSAGE_INVALID);
         this.callback.call(this.context, message);
     }
 });
@@ -147,12 +142,12 @@ var InputPort = Port.extend({
 var OutputPort = Port.extend({
     connect: function (port) {
         if (!(port instanceof InputPort))
-            throw new Error("Invalid argument: port, InputPort required.");
+            throw new Error(warning.INPUT_PORT_INVALID);
         Port.prototype.connect.apply(this, arguments);
     },
     relay: function (message) {
         if (!(message instanceof Message))
-            throw new Error("Invalid argument: message, Message required.");
+            throw new Error(warning.MESSAGE_INVALID);
         for (var id in this.connections) {
             var input = this.connections[id];
             input.relay(message);
@@ -187,7 +182,7 @@ var Subscriber = Component.extend({
     },
     update: function (config) {
         if (!(config.callback instanceof Function))
-            throw new Error("Invalid argument: config.callback, Function required.");
+            throw new Error(warning.CONFIG_CALLBACK_INVALID);
         this.callback = config.callback;
         this.context = config.context;
     },
@@ -196,11 +191,10 @@ var Subscriber = Component.extend({
     }
 });
 
-
 var Traverser = Publisher.extend({
     traverse: function (component) {
         if (!(component instanceof Component))
-            throw new Error("Invalid argument: origin, Component required.");
+            throw new Error(warning.COMPONENT_INVALID);
         this.traverseNext([component], {});
     },
     traverseNext: function (queue, visited) {
@@ -260,30 +254,47 @@ var Transformer = Component.extend({
             component: this
         });
         if (!(config.callback instanceof Function))
-            throw new Error("Invalid argument: config.callback, Function required.");
+            throw new Error(warning.CONFIG_CALLBACK_INVALID);
         this.callback = config.callback;
         this.context = config.context;
     },
     transform: function (incoming) {
         var done = function (data, error) {
             if (data === incoming.data)
-                throw new Error("Transforming the incoming data array can have unexpected results, so it is not allowed.");
+                throw new Error(warning.CANNOT_TRANSFORM_SAME_ARRAY);
             if (error) {
                 if (error instanceof Array)
                     this.ports.stderr.relay(new Message(error));
                 else
-                    throw new Error("Invalid error data, Array required.");
+                    throw new Error(warning.ERROR_DATA_INVALID);
             }
             else {
                 if (data instanceof Array)
                     this.ports.stdout.relay(new Message(data));
                 else
-                    throw new Error("Invalid results, Array required.");
+                    throw new Error(warning.MESSAGE_DATA_INVALID);
             }
         }.bind(this);
         this.callback.call(this.context, incoming.data, done);
     }
 });
+
+var warning = {
+    ABSTRACT_CLASS_INSTANTIATION: "Tried to instantiate an abstract class.",
+    ABSTRACT_METHOD_CALL: "Tried to call an abstract method.",
+    CONFIG_REQUIRED: "Invalid arguments: config is required.",
+    CONFIG_COMPONENT_REQUIRED: "Invalid arguments: config.component is required.",
+    CONFIG_COMPONENT_INVALID: "Invalid arguments: config.component, Component required.",
+    PORT_INVALID: "Invalid arguments: port, Port required.",
+    CONFIG_CALLBACK_INVALID: "Invalid arguments: config.callback, Function required.",
+    OUTPUT_PORT_INVALID: "Invalid argument: port, OutputPort required.",
+    MESSAGE_INVALID: "Invalid argument: message, Message required.",
+    INPUT_PORT_INVALID: "Invalid argument: port, InputPort required.",
+    COMPONENT_INVALID: "Invalid argument: origin, Component required.",
+    CANNOT_TRANSFORM_SAME_ARRAY: "Transforming the incoming data array can have unexpected results, so it is not allowed.",
+    ERROR_DATA_INVALID: "Invalid error data, Array required.",
+    MESSAGE_DATA_INVALID: "Invalid results, Array required."
+};
 
 var dflo = {
     Class: Class,
@@ -297,7 +308,8 @@ var dflo = {
     Publisher: Publisher,
     Subscriber: Subscriber,
     Traverser: Traverser,
-    Transformer: Transformer
+    Transformer: Transformer,
+    warning: warning
 };
 
 module.exports = dflo;

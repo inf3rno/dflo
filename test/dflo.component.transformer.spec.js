@@ -1,7 +1,8 @@
 var dflo = require("../dflo"),
     Publisher = dflo.Publisher,
     Subscriber = dflo.Subscriber,
-    Transformer = dflo.Transformer;
+    Transformer = dflo.Transformer,
+    warning = dflo.warning;
 
 describe("dflo", function () {
 
@@ -51,7 +52,7 @@ describe("dflo", function () {
 
             expect(function () {
                 publisher.publish(0, 1, 2);
-            }).toThrow("Transforming the incoming data array can have unexpected results, so it is not allowed.");
+            }).toThrow(warning.CANNOT_TRANSFORM_SAME_ARRAY);
         });
 
         it("throws error if we send a non array value as results", function () {
@@ -65,7 +66,7 @@ describe("dflo", function () {
 
             expect(function () {
                 publisher.publish();
-            }).toThrow("Invalid results, Array required.");
+            }).toThrow(warning.MESSAGE_DATA_INVALID);
         });
 
         it("can send error messages if cannot transform", function () {
@@ -114,7 +115,7 @@ describe("dflo", function () {
             publisher.ports.stdout.connect(transformer.ports.stdin);
             expect(function () {
                 publisher.publish();
-            }).toThrow("Invalid error data, Array required.")
+            }).toThrow(warning.ERROR_DATA_INVALID)
         });
 
     });
