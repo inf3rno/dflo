@@ -155,6 +155,14 @@ var OutputPort = Port.extend({
     }
 });
 
+var CustomComponent = Component.extend({
+    init: function (init) {
+        Component.prototype.init.apply(this, arguments);
+        if (init instanceof Function)
+            init.apply(this, [].slice.call(arguments, 1));
+    }
+});
+
 var Publisher = Component.extend({
     init: function (config) {
         Component.prototype.init.apply(this, arguments);
@@ -328,6 +336,7 @@ var dflo = {
     OutputPort: OutputPort,
     Message: Message,
     Component: Component,
+    CustomComponent: CustomComponent,
     Publisher: Publisher,
     Subscriber: Subscriber,
     Traverser: Traverser,
