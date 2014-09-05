@@ -15,6 +15,8 @@
     var Publisher = dflo.Publisher;
     var Subscriber = dflo.Subscriber;
     var Transformer = dflo.Transformer;
+    var CustomComponent = dflo.CustomComponent;
+    var InputPort = dflo.InputPort;
     var Builder = dflo.Builder;
 
     var usableData = new Publisher();
@@ -54,6 +56,15 @@
     builder.connectAll(usableData.ports.stdout, usable2Result.ports.stdin);
     builder.connectAll(raw2usable.ports.stderr, usable2Result.ports.stderr, errorLogger.ports.stdin);
     builder.connectAll(usable2Result.ports.stdout, resultLogger.ports.stdin);
+
+    builder.connectAll(new CustomComponent(function () {
+        this.ports.stdin = new InputPort({
+            component: this,
+            callback: function (message) {
+                console.log("custom stdin", message.data);
+            }
+        });
+    }).ports.stdin, usable2Result.ports.stdout);
 
     //traversing the network and displaying a network graph
 
