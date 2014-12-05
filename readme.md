@@ -1,3 +1,7 @@
+# deprecated
+
+Now I am developing dflo2 with a different concept. I added dflo2 examples as well, so you can check the difference.
+
 # DFlo project - dataflow islands for async coding in javascript
 
 The main goal I wanted to achieve was bidirectional data binding between models and views in client side javascript. Meantime I realized, that
@@ -49,6 +53,49 @@ should be solved with dataflow-based code islands.
     });
 ```
 
+dflo2:
+
+```js
+	var Subject = function (state){
+		this.output = df.publisher();
+		this.links = {};
+		this.state = state;
+	};
+	Subject.prototype = {
+		changeState: function (state) {
+			this.state = state;
+			this.notifyObservers();
+		},
+		registerObserver: function (observer) {
+			if (!this.links[observer.id])
+				this.links[observer.id] = df.link(this.output, observer.input).connect();
+		},
+		unregisterObserver: function (observer) {
+			if (this.links[observer.id]){
+				this.links[observer.id].disconnect();
+				delete(this.links[observer.id]);
+			}
+		},
+		notifyObservers: function () {
+			this.output.publish(this.state);
+		}
+	};
+
+	var Observer = function (){
+		this.id = unique.id();
+		this.input = df.subscriber(function (state){
+			this.observer.notify(state);
+		}, {observer: this});
+	};
+	Observer.prototype = {
+		notify: function (){
+			//...
+		}
+	};
+
+```
+
+
 [The example code is available here as a jasmine test.](test/example.observer.spec.js)
 
 ### Traversing network graph
@@ -95,6 +142,51 @@ It displays the network graph using SVG. For example by the following network:
     builder.connectAll(usableData.ports.stdout, usable2Result.ports.stdin);
     builder.connectAll(raw2usable.ports.stderr, usable2Result.ports.stderr, errorLogger.ports.stdin);
     builder.connectAll(usable2Result.ports.stdout, resultLogger.ports.stdin);
+```
+
+dflo2: 
+
+```js
+    var usableData = df({out: df.publisher});
+    var rawData = df({out: df.publisher});
+    var resultLogger = df({in: function (result) {
+		console.log(result);
+	}});
+    var errorLogger = df({in: function (err) {
+		console.error(err);
+	}});
+	
+    var raw2usable = df({
+		in: function (raw, done) {
+            //do something to prepare raw data for the transformation
+            if (err)
+                this.err(err);
+            else
+                this.out(usable);
+        },
+		err: df.publisher,
+		out: df.publisher
+	})
+	
+    var usable2Result = df({
+		in: function (usable, done) {
+            //real transformation
+            if (err)
+                this.err(err);
+            else
+                this.out(result);
+        },
+		err: df.publisher,
+		out: df.publisher
+	});
+	
+	df.link(rawData.out, raw2usable.in).connect();
+	df.link(raw2usable.out, usable2Result.in).connect();
+	df.link(usableData.out, usable2Result.in).connect();
+	df.link([raw2usable.err, usable2Result.err], errorLogger.in).connect();
+	df.link(usable2Result.out, resultLogger.in).connect();
+
+	rawData.out.publish({...});
 ```
 
 the results will be something like this, after rearranging the nodes for a short while with drag&drop.
