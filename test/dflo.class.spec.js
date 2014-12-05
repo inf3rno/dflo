@@ -105,6 +105,51 @@ describe("dflo", function () {
                 expect(instance instanceof Descendant).toBe(true);
             });
 
+            it('lib should be instantiated for each matching element', function () {
+                var mockClass = function (Subject) {
+                    var Surrogate = function () {
+                        Surrogate.prototype.constructor.apply(this, arguments);
+                    };
+                    Surrogate.prototype = Object.create(Subject.prototype);
+                    Surrogate.prototype.constructor = Subject;
+                    return Surrogate;
+                };
+
+                var My = function (a) {
+                    this.init(a);
+                };
+                My.prototype = {
+                    init: function (a) {
+                        this.setA(a);
+                    },
+                    setA: function (a) {
+                        this.a = a;
+                    }
+                };
+
+                var Mock = mockClass(My);
+                spyOn(Mock.prototype, "constructor").andCallThrough();
+                spyOn(Mock.prototype, "init");
+
+                var m = new Mock(1);
+
+                expect(Mock.prototype.init).toBe(m.init);
+                expect(My.prototype.init).not.toBe(m.init);
+                expect(m.constructor).toHaveBeenCalledWith(1);
+                expect(m.init).toHaveBeenCalledWith(1);
+                expect(m.a).toBeUndefined();
+                m.setA(1);
+                expect(m.a).toBe(1);
+
+                spyOn(Mock.prototype, "setA").andCallFake(function (a) {
+                    this.a = a + 1;
+                });
+                m.setA(1);
+                expect(m.setA).toHaveBeenCalledWith(1);
+                expect(m.a).toBe(2);
+
+            });
+
         });
 
     });
