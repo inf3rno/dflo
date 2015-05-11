@@ -1,6 +1,6 @@
 # deprecated
 
-Now I am developing dflo2 with a different concept. I added dflo2 examples as well, so you can check the difference. ** Actually I renamed dflo2 to [DataFlower](https://github.com/inf3rno/dataflower) since the last edit.**
+Now I am developing dflo2 with a different concept. I added dflo2 examples as well, so you can check the difference. **Actually I renamed dflo2 to [DataFlower](https://github.com/inf3rno/dataflower) since the last edit.**
 
 # DFlo project - dataflow islands for async coding in javascript
 
